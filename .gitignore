@@ -1,0 +1,6 @@
+*.img
+*.bin
+*.elf
+*.hex
+*.list
+!rasberrypi_firmware/*
