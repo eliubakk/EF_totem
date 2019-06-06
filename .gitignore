@@ -3,4 +3,5 @@
 *.elf
 *.hex
 *.list
-!rasberrypi_firmware/*
+*.o
+!raspberrypi_firmware/**
