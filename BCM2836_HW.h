@@ -10,8 +10,8 @@
  *
  */
 
-#ifndef __BCM2836_HW__
-#define __BCM2836_HW__
+#ifndef __BCM2836_HW_H__
+#define __BCM2836_HW_H__
 
 #include "stdint.h"
 
@@ -21,7 +21,7 @@ extern unsigned int GET32 ( unsigned int );
 /* Base peripheral address */
 #define P_BASE 0x3F000000
 
-/* GPIO register adderesses */
+/* GPIO register addresses */
 #define GPIO_BASE	(P_BASE + 0x00200000)
 #define GPFSEL(n)	(GPIO_BASE + ((n) * 0x4))	/* GPIO Function Select 0-5 */
 #define GPSET0		(GPIO_BASE + 0x1C)			/* GPIO Pin Output Set 0 */
@@ -58,6 +58,7 @@ extern unsigned int GET32 ( unsigned int );
 #define GPIO_ALT4		3
 #define GPIO_ALT5		2
 
+/* GPIO Function Definitions */
 void GPIO_configure(uint8_t pin, uint8_t mode);
 
 void GPIO_set(uint8_t pin);
@@ -68,16 +69,29 @@ uint8_t GPIO_level(uint8_t pin);
 
 void GPIO_toggle(uint8_t pin);
 
-#define ARM_TIMER_LOD 0x3F00B400
-#define ARM_TIMER_VAL 0x3F00B404
-#define ARM_TIMER_CTL 0x3F00B408
-#define ARM_TIMER_CLI 0x3F00B40C
-#define ARM_TIMER_RIS 0x3F00B410
-#define ARM_TIMER_MIS 0x3F00B414
-#define ARM_TIMER_RLD 0x3F00B418
-#define ARM_TIMER_DIV 0x3F00B41C
-#define ARM_TIMER_CNT 0x3F00B420
+/* System Timer addresses */
+#define SYSTIMER_FREQ		250000000	/* 250MHz */
+#define SYSTIMER_PERIOD_US	0.004		/* 0.004us/period */
+#define SYSTIMER_BASE	(P_BASE + 0x3000) 
+#define SYSTIMER_CS		(SYSTIMER_BASE)			/* System Timer Control/Status */
+#define SYSTIMER_CLO	(SYSTIMER_BASE + 0x4)	/* System Timer Counter Lower 32 bits */
+#define SYSTIMER_CHI	(SYSTIMER_BASE + 0x8)	/* System Timer Counter Higher 32 bits */
+#define SYSTIMER_C(n)	(SYSTIMER_BASE + 0xC + ((n) * 0x4))	/* System Timer Compare 0-3 */ 		
 
-#define SYSTIMERCLO 0x3F003004
+/* System Timer Function Definitions */
+#define SYSTIMER_MATCH(n)	(1 & (GET32(SYSTIMER_CS) >> n))	/* Match detected for timers 0-3 */
+#define SYSTIMER_MATCH_CLR(n) PUT32(SYSTIMER_CS, 1 << n)
+
+/* Arm Timer addresses */
+#define ARM_TIMER_BASE	(P_BASE + 0xB000)
+#define ARM_TIMER_LOD	(ARM_TIMER_BASE + 0x400)	/* Load */
+#define ARM_TIMER_VAL	(ARM_TIMER_BASE + 0x404)	/* Value */
+#define ARM_TIMER_CTL	(ARM_TIMER_BASE + 0x408)	/* Control */
+#define ARM_TIMER_CLI	(ARM_TIMER_BASE + 0x40C)	/* IRQ Clear/Ack */
+#define ARM_TIMER_RIS	(ARM_TIMER_BASE + 0x410)	/* RAW IRQ */
+#define ARM_TIMER_MIS	(ARM_TIMER_BASE + 0x414)	/* MAsked IRQ */
+#define ARM_TIMER_RLD	(ARM_TIMER_BASE + 0x418)	/* Reload */
+#define ARM_TIMER_DIV	(ARM_TIMER_BASE + 0x41C)	/* Pre-divider */
+#define ARM_TIMER_CNT	(ARM_TIMER_BASE + 0x420)	/* Free running counter */
 
 #endif
