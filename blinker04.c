@@ -14,6 +14,9 @@ int notmain ( void )
 {
     GPIO_configure(35, GPIO_OUTPUT);
     GPIO_configure(47, GPIO_OUTPUT);
+    GPIO_clear(47);
+    GPIO_set(35);
+
 
     PUT32(ARM_TIMER_CTL, 0x003E0000);
     PUT32(ARM_TIMER_LOD, TIMEOUT-1);
@@ -24,12 +27,12 @@ int notmain ( void )
 
     while(1)
     {
-        GPIO_set(47);
-        GPIO_clear(35);
+        GPIO_toggle(47);
+        GPIO_toggle(35);
         while(1) if(GET32(ARM_TIMER_RIS)) break;
         PUT32(ARM_TIMER_CLI, 0);
-        GPIO_clear(47);
-        GPIO_set(35);
+        GPIO_toggle(47);
+        GPIO_toggle(35);
         while(1) if(GET32(ARM_TIMER_RIS)) break;
         PUT32(ARM_TIMER_CLI, 0);
     }

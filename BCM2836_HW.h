@@ -66,6 +66,8 @@ void GPIO_clear(uint8_t pin);
 
 uint8_t GPIO_level(uint8_t pin);
 
+void GPIO_toggle(uint8_t pin);
+
 #define ARM_TIMER_LOD 0x3F00B400
 #define ARM_TIMER_VAL 0x3F00B404
 #define ARM_TIMER_CTL 0x3F00B408
