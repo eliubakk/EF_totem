@@ -10,10 +10,11 @@ GCC = $(COMPILER_BASE)/bin/arm-eabi-gcc
 AOPS = --warn --fatal-warnings 
 COPS = -Wall -Werror -O2 -nostdlib -nostartfiles -ffreestanding 
 
-PROJECT_NAME = test
+PROJECT_NAME = blinker04
 
-SRCS = blinker04.c
-OBJS = vectors.o $(PROJECT_NAME).o
+ASMS = vectors.s
+SRCS = blinker04.c BCM2836_HW.c
+OBJS = vectors.o BCM2836_HW.o $(PROJECT_NAME).o
 
 gcc : $(PROJECT_NAME).hex kernel.img
 
@@ -29,11 +30,14 @@ clean :
 	rm -f *.bc
 	rm -f *.clang.opt.s
 
-vectors.o : vectors.s
-	$(ARMGNU)/as vectors.s -o vectors.o
+$(patsubst %.s, %.o, $(ASMS)): %.o : %.s
+	$(ARMGNU)/as $^ -o $@
 
-$(PROJECT_NAME).o : $(SRCS)
-	$(GCC) $(COPS) -c $(SRCS) -o $(PROJECT_NAME).o
+$(patsubst %.c, %.o, $(SRCS)): %.o : %.c
+	$(GCC) $(COPS) -c $^ -o $@
+
+# $(PROJECT_NAME).o : $(SRCS)
+# 	$(GCC) $(COPS) -c $(SRCS) -o $(PROJECT_NAME).o
 
 $(PROJECT_NAME).elf : memmap $(OBJS) 
 	$(ARMGNU)/ld.bfd $(OBJS) -T memmap -o $(PROJECT_NAME).elf
