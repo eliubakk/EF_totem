@@ -21,6 +21,9 @@ extern unsigned int GET32 ( unsigned int );
 /* Base peripheral address */
 #define P_BASE 0x3F000000
 
+/* ARM base register address */
+#define ARM_BASE 0x40000000
+
 /* GPIO register addresses */
 #define GPIO_BASE	(P_BASE + 0x00200000)
 #define GPFSEL(n)	(GPIO_BASE + ((n) * 0x4))	/* GPIO Function Select 0-5 */
@@ -79,8 +82,28 @@ void GPIO_toggle(uint8_t pin);
 #define SYSTIMER_C(n)	(SYSTIMER_BASE + 0xC + ((n) * 0x4))	/* System Timer Compare 0-3 */ 		
 
 /* System Timer Function Definitions */
-#define SYSTIMER_MATCH(n)	(1 & (GET32(SYSTIMER_CS) >> n))	/* Match detected for timers 0-3 */
-#define SYSTIMER_MATCH_CLR(n) PUT32(SYSTIMER_CS, 1 << n)
+#define SYSTIMER_MATCH(n)	(1 & (GET32(SYSTIMER_CS) >> (n)))	/* Match detected for timers 0-3 */
+#define SYSTIMER_MATCH_CLR(n) PUT32(SYSTIMER_CS, 1 << (n))
+#define SYSTIMER_COUNT	GET32(SYSTIMER_CLO)
+#define SYSTIMER_C_SET(n, val) PUT32(SYSTIMER_C(n), (val))
+
+/* ARM register adderesses */
+#define ARM_CORE_TMR_CTL 	(ARM_BASE)					/* Control register */
+#define ARM_CORE_TMR_SCALE	(ARM_BASE + 0x8)			/* Core timer pre-scaler */
+#define ARM_CORE_TMR_LSB	(ARM_BASE + 0x1C)			/* Core timer LS 32 bits */
+#define ARM_CORE_TMR_MSB	(ARM_BASE + 0x20)			/* Core timer MS 32 bits */
+#define ARM_GPU_INT			(ARM_BASE + 0xC)			/* GPU interrupt routing */
+#define ARM_PMU_INT_SET		(ARM_BASE + 0x10)			/* PMU interrupt routing write-set */
+#define ARM_PMU_INT_CLR		(ARM_BASE + 0x14)			/* PMU interrupt routing write-clear */
+#define ARM_CORE_TMRIRQ(n)	(ARM_BASE + 0x40 + ((n)*0x4))	/* Core 0-3 Timers interrupt control */
+#define ARM_CORE_MBOXIRQ(n)	(ARM_BASE + 0x50 + ((n)*0x4))	/* Core 0-3 Mailboxes interrupt control */
+#define ARM_CORE_IRQSRC(n)	(ARM_BASE + 0x60 + ((n)*0x4))	/* Core 0-3 interrupt source */
+#define ARM_CORE_FIQSRC(n)	(ARM_BASE + 0x70 + ((n)*0x4))	/* Core 0-3 fast interrupt source */
+#define ARM_LOCAL_TMR_CTL	(ARM_BASE + 0x34)			/* Local timer control & status */
+#define ARM_LOCAL_TMR_IRQ	(ARM_BASE + 0x38)			/* Local timer IRQ clear & reload */
+#define ARM_LOCAL_INT		(ARM_BASE + 0x24)			/* Local interrupt routing */
+
+
 
 /* Arm Timer addresses */
 #define ARM_TIMER_BASE	(P_BASE + 0xB000)
@@ -89,7 +112,7 @@ void GPIO_toggle(uint8_t pin);
 #define ARM_TIMER_CTL	(ARM_TIMER_BASE + 0x408)	/* Control */
 #define ARM_TIMER_CLI	(ARM_TIMER_BASE + 0x40C)	/* IRQ Clear/Ack */
 #define ARM_TIMER_RIS	(ARM_TIMER_BASE + 0x410)	/* RAW IRQ */
-#define ARM_TIMER_MIS	(ARM_TIMER_BASE + 0x414)	/* MAsked IRQ */
+#define ARM_TIMER_MIS	(ARM_TIMER_BASE + 0x414)	/* Masked IRQ */
 #define ARM_TIMER_RLD	(ARM_TIMER_BASE + 0x418)	/* Reload */
 #define ARM_TIMER_DIV	(ARM_TIMER_BASE + 0x41C)	/* Pre-divider */
 #define ARM_TIMER_CNT	(ARM_TIMER_BASE + 0x420)	/* Free running counter */

@@ -12,10 +12,12 @@
 #include "BCM2836_HW.h"
 
 #define LED_FREQ_HZ		800000
-#define LED_ZERO_HIGH	100		/* 0.4us / 0.004us = 100 clock periods */
-#define LED_ONE_HIGH	200		/* 0.8us / 0.004us = 200 clock periods */
-#define LED_ZERO_LOW	212		/* 0.85us / 0.004us = 212.5 clock periods */
-#define LED_ONE_LOW		112		/* 0.45us / 0.004us = 112.5 clock periods */
+#define LED_ZERO_HIGH	100 //250000000		/* 0.4us / 0.004us = 100 clock periods */
+#define LED_ONE_HIGH	200 //500000000		/* 0.8us / 0.004us = 200 clock periods */
+#define LED_ZERO_LOW	212 //250000000		/* 0.85us / 0.004us = 212.5 clock periods */
+#define LED_ONE_LOW		112 //500000000		/* 0.45us / 0.004us = 112.5 clock periods */
 #define LED_RESET		12500	/* low more than 50us, 50us / 0.004us = 12500 clock periods */
+
+void send_data(uint8_t pin, uint32_t data);
 
 #endif
