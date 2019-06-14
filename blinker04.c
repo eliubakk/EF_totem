@@ -18,38 +18,45 @@ int notmain ( void )
     //GPIO 47 is Green LED
     //GPIO 35 is Red LED
     GPIO_configure(35, GPIO_OUTPUT);
-    GPIO_configure(17, GPIO_OUTPUT);
+    GPIO_configure(47, GPIO_OUTPUT);
 
-    GPIO_clear(17);
+    GPIO_clear(47);
     GPIO_clear(35);
-    //GPIO_set(35);
+    GPIO_set(35);
 
 
-    PUT32(ARM_TIMER_CTL, 0x003E0002);
-    PUT32(ARM_TIMER_LOD, TIMEOUT-1);
-    //PUT32(ARM_TIMER_RLD, TIMEOUT-1);
+    ARM_TIMER_CTL = 0x003E0002;
+    ARM_TIMER_LOD = (TIMEOUT-1);
+    ARM_TIMER_RLD = (TIMEOUT-1);
     //PUT32(ARM_TIMER_DIV, 0x000000F9);
     //PUT32(ARM_TIMER_CTL, 0x00000002);
-    PUT32(ARM_TIMER_DIV, 0x00000000);
-    PUT32(ARM_TIMER_CLI, 0);
-    PUT32(ARM_TIMER_CTL, 0x003E0082);
+    ARM_TIMER_DIV = 0x00000000;
+    ARM_TIMER_CLI = 0;
+    ARM_TIMER_CTL = 0x003E0082;
 
     //PUT32(ARM_CORE_TMR_SCALE, 0x80000000);
 
     while(1)
     {
-       //GPIO_toggle(35);
-        send_data(17, 0x0000FF00);
+        //GPIO_toggle(35);
+        //send_data(17, 0x0000FF00);
         //GPIO_toggle(35);
         //timer_count = SYSTIMER_COUNT;
         //SYSTIMER_C_SET(1, timer_count + TIMEOUT);
         //SYSTIMER_MATCH_CLR(1);
         //while(1) if(SYSTIMER_MATCH(1)) break;
-        PUT32(ARM_TIMER_LOD, TIMEOUT-1);
-        PUT32(ARM_TIMER_CLI, 0);
-        while(1) if(GET32(ARM_TIMER_RIS)) break;
-        PUT32(ARM_TIMER_CLI, 0);
+        //ARM_TIMER_LOD = (TIMEOUT-1);
+        //ARM_TIMER_CLI = 0;
+        while(1) if(ARM_TIMER_RIS) break;
+        ARM_TIMER_CLI = 0;
         GPIO_toggle(35);
+        GPIO_toggle(47);
+
+        while(1) if(ARM_TIMER_RIS) break;
+        ARM_TIMER_CLI = 0;
+        GPIO_toggle(35);
+        GPIO_toggle(47);
+
         //GPIO_toggle(47);
         //GPIO_toggle(35);
         //while(1) if(GET32(ARM_TIMER_RIS)) break;
