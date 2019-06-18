@@ -9,11 +9,13 @@ extern void dummy ( unsigned int );
 
 //#define TIMEOUT 20000000
 #define TIMEOUT 250000000
+#define NUM_LED 25
 
 //-------------------------------------------------------------------------
 int notmain ( void )
 {
     //volatile uint32_t timer_count;
+    uint32_t led_i;
 
     //GPIO 47 is Green LED
     //GPIO 35 is Red LED
@@ -50,11 +52,9 @@ int notmain ( void )
         //SYSTIMER_C_SET(1, timer_count + TIMEOUT);
         //SYSTIMER_MATCH_CLR(1);
         //while(1) if(SYSTIMER_MATCH(1)) break;
-        send_data(17, COLOR_GREEN);
-        send_data(17, COLOR_GREEN);
-        send_data(17, COLOR_GREEN);
-        send_data(17, COLOR_GREEN);
-        send_data(17, COLOR_GREEN);
+        for(led_i = 0; led_i < NUM_LED; ++led_i){
+            send_data(17, COLOR_RED);
+        }
         ARM_TIMER_LOD = (TIMEOUT-1);
         ARM_TIMER_CLI = 0;
         while(1) if(ARM_TIMER_RIS) break;

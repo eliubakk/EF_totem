@@ -19,13 +19,31 @@ void send_data(uint8_t pin, uint32_t data) {
 		//
 		LOW_PIN_SEND_ZERO(pin_mask);
 		LOW_PIN_SEND_ZERO(pin_mask);
+		LOW_PIN_SEND_ZERO(pin_mask);
+		LOW_PIN_SEND_ZERO(pin_mask);
+
+		//
+		LOW_PIN_SEND_ZERO(pin_mask);
+		LOW_PIN_SEND_ZERO(pin_mask);
+		LOW_PIN_SEND_ZERO(pin_mask);
+		LOW_PIN_SEND_ZERO(pin_mask);
+
+		//
+		LOW_PIN_SEND_ZERO(pin_mask);
+		LOW_PIN_SEND_ZERO(pin_mask);
+		LOW_PIN_SEND_ZERO(pin_mask);
+		LOW_PIN_SEND_ONE(pin_mask);
+
+		//
+		LOW_PIN_SEND_ONE(pin_mask);
+		LOW_PIN_SEND_ONE(pin_mask);
+		LOW_PIN_SEND_ONE(pin_mask);
+		LOW_PIN_SEND_ONE(pin_mask);
+
+		//
+		LOW_PIN_SEND_ONE(pin_mask);
 		LOW_PIN_SEND_ONE(pin_mask);
 		LOW_PIN_SEND_ZERO(pin_mask);
-
-		//
-		LOW_PIN_SEND_ZERO(pin_mask);
-		LOW_PIN_SEND_ZERO(pin_mask);
-		LOW_PIN_SEND_ZERO(pin_mask);
 		LOW_PIN_SEND_ZERO(pin_mask);
 
 		//
@@ -34,266 +52,248 @@ void send_data(uint8_t pin, uint32_t data) {
 		LOW_PIN_SEND_ZERO(pin_mask);
 		LOW_PIN_SEND_ZERO(pin_mask);
 
-		//
-		LOW_PIN_SEND_ZERO(pin_mask);
-		LOW_PIN_SEND_ZERO(pin_mask);
-		LOW_PIN_SEND_ZERO(pin_mask);
-		LOW_PIN_SEND_ZERO(pin_mask);
-
-		//
-		LOW_PIN_SEND_ZERO(pin_mask);
-		LOW_PIN_SEND_ZERO(pin_mask);
-		LOW_PIN_SEND_ZERO(pin_mask);
-		LOW_PIN_SEND_ZERO(pin_mask);
-
-		//
-		LOW_PIN_SEND_ZERO(pin_mask);
-		LOW_PIN_SEND_ZERO(pin_mask);
-		LOW_PIN_SEND_ZERO(pin_mask);
-		LOW_PIN_SEND_ZERO(pin_mask);
-
-		// if(data & DATA_MASK_B0){
-		// 	LOW_PIN_SEND_ONE(pin_mask);
-		// } else {
-		// 	LOW_PIN_SEND_ZERO(pin_mask);
-		// }
-		// if(data & DATA_MASK_B1){
-		// 	LOW_PIN_SEND_ONE(pin_mask);
-		// } else {
-		// 	LOW_PIN_SEND_ZERO(pin_mask);
-		// }
-		// if(data & DATA_MASK_B2){
-		// 	LOW_PIN_SEND_ONE(pin_mask);
-		// } else {
-		// 	LOW_PIN_SEND_ZERO(pin_mask);
-		// }
-		// if(data & DATA_MASK_B3){
-		// 	LOW_PIN_SEND_ONE(pin_mask);
-		// } else {
-		// 	LOW_PIN_SEND_ZERO(pin_mask);
-		// }
-		// if(data & DATA_MASK_B4){
-		// 	LOW_PIN_SEND_ONE(pin_mask);
-		// } else {
-		// 	LOW_PIN_SEND_ZERO(pin_mask);
-		// }
-		// if(data & DATA_MASK_B5){
-		// 	LOW_PIN_SEND_ONE(pin_mask);
-		// } else {
-		// 	LOW_PIN_SEND_ZERO(pin_mask);
-		// }
-		// if(data & DATA_MASK_B6){
-		// 	LOW_PIN_SEND_ONE(pin_mask);
-		// } else {
-		// 	LOW_PIN_SEND_ZERO(pin_mask);
-		// }
-		// if(data & DATA_MASK_B7){
-		// 	LOW_PIN_SEND_ONE(pin_mask);
-		// } else {
-		// 	LOW_PIN_SEND_ZERO(pin_mask);
-		// }
-		// if(data & DATA_MASK_B8){
-		// 	LOW_PIN_SEND_ONE(pin_mask);
-		// } else {
-		// 	LOW_PIN_SEND_ZERO(pin_mask);
-		// }
-		// if(data & DATA_MASK_B9){
-		// 	LOW_PIN_SEND_ONE(pin_mask);
-		// } else {
-		// 	LOW_PIN_SEND_ZERO(pin_mask);
-		// }
-		// if(data & DATA_MASK_B10){
-		// 	LOW_PIN_SEND_ONE(pin_mask);
-		// } else {
-		// 	LOW_PIN_SEND_ZERO(pin_mask);
-		// }
-		// if(data & DATA_MASK_B11){
-		// 	LOW_PIN_SEND_ONE(pin_mask);
-		// } else {
-		// 	LOW_PIN_SEND_ZERO(pin_mask);
-		// }
-		// if(data & DATA_MASK_B12){
-		// 	LOW_PIN_SEND_ONE(pin_mask);
-		// } else {
-		// 	LOW_PIN_SEND_ZERO(pin_mask);
-		// }
-		// if(data & DATA_MASK_B13){
-		// 	LOW_PIN_SEND_ONE(pin_mask);
-		// } else {
-		// 	LOW_PIN_SEND_ZERO(pin_mask);
-		// }
-		// if(data & DATA_MASK_B14){
-		// 	LOW_PIN_SEND_ONE(pin_mask);
-		// } else {
-		// 	LOW_PIN_SEND_ZERO(pin_mask);
-		// }
-		// if(data & DATA_MASK_B15){
-		// 	LOW_PIN_SEND_ONE(pin_mask);
-		// } else {
-		// 	LOW_PIN_SEND_ZERO(pin_mask);
-		// }
-		// if(data & DATA_MASK_B16){
-		// 	LOW_PIN_SEND_ONE(pin_mask);
-		// } else {
-		// 	LOW_PIN_SEND_ZERO(pin_mask);
-		// }
-		// if(data & DATA_MASK_B17){
-		// 	LOW_PIN_SEND_ONE(pin_mask);
-		// } else {
-		// 	LOW_PIN_SEND_ZERO(pin_mask);
-		// }
-		// if(data & DATA_MASK_B18){
-		// 	LOW_PIN_SEND_ONE(pin_mask);
-		// } else {
-		// 	LOW_PIN_SEND_ZERO(pin_mask);
-		// }
-		// if(data & DATA_MASK_B19){
-		// 	LOW_PIN_SEND_ONE(pin_mask);
-		// } else {
-		// 	LOW_PIN_SEND_ZERO(pin_mask);
-		// }
-		// if(data & DATA_MASK_B20){
-		// 	LOW_PIN_SEND_ONE(pin_mask);
-		// } else {
-		// 	LOW_PIN_SEND_ZERO(pin_mask);
-		// }
-		// if(data & DATA_MASK_B21){
-		// 	LOW_PIN_SEND_ONE(pin_mask);
-		// } else {
-		// 	LOW_PIN_SEND_ZERO(pin_mask);
-		// }
-		// if(data & DATA_MASK_B22){
-		// 	LOW_PIN_SEND_ONE(pin_mask);
-		// } else {
-		// 	LOW_PIN_SEND_ZERO(pin_mask);
-		// }
-		// if(data & DATA_MASK_B23){
-		// 	LOW_PIN_SEND_ONE(pin_mask);
-		// } else {
-		// 	LOW_PIN_SEND_ZERO(pin_mask);
-		// }
-	} else {
-		pin_mask = (1 << (pin - 32));
-		if(data & DATA_MASK_B0){
-			HIGH_PIN_SEND_ONE(pin_mask);
-		} else {
-			HIGH_PIN_SEND_ZERO(pin_mask);
-		}
-		if(data & DATA_MASK_B1){
-			HIGH_PIN_SEND_ONE(pin_mask);
-		} else {
-			HIGH_PIN_SEND_ZERO(pin_mask);
-		}
-		if(data & DATA_MASK_B2){
-			HIGH_PIN_SEND_ONE(pin_mask);
-		} else {
-			HIGH_PIN_SEND_ZERO(pin_mask);
-		}
-		if(data & DATA_MASK_B3){
-			HIGH_PIN_SEND_ONE(pin_mask);
-		} else {
-			HIGH_PIN_SEND_ZERO(pin_mask);
-		}
-		if(data & DATA_MASK_B4){
-			HIGH_PIN_SEND_ONE(pin_mask);
-		} else {
-			HIGH_PIN_SEND_ZERO(pin_mask);
-		}
-		if(data & DATA_MASK_B5){
-			HIGH_PIN_SEND_ONE(pin_mask);
-		} else {
-			HIGH_PIN_SEND_ZERO(pin_mask);
-		}
-		if(data & DATA_MASK_B6){
-			HIGH_PIN_SEND_ONE(pin_mask);
-		} else {
-			HIGH_PIN_SEND_ZERO(pin_mask);
-		}
-		if(data & DATA_MASK_B7){
-			HIGH_PIN_SEND_ONE(pin_mask);
-		} else {
-			HIGH_PIN_SEND_ZERO(pin_mask);
-		}
-		if(data & DATA_MASK_B8){
-			HIGH_PIN_SEND_ONE(pin_mask);
-		} else {
-			HIGH_PIN_SEND_ZERO(pin_mask);
-		}
-		if(data & DATA_MASK_B9){
-			HIGH_PIN_SEND_ONE(pin_mask);
-		} else {
-			HIGH_PIN_SEND_ZERO(pin_mask);
-		}
-		if(data & DATA_MASK_B10){
-			HIGH_PIN_SEND_ONE(pin_mask);
-		} else {
-			HIGH_PIN_SEND_ZERO(pin_mask);
-		}
-		if(data & DATA_MASK_B11){
-			HIGH_PIN_SEND_ONE(pin_mask);
-		} else {
-			HIGH_PIN_SEND_ZERO(pin_mask);
-		}
-		if(data & DATA_MASK_B12){
-			HIGH_PIN_SEND_ONE(pin_mask);
-		} else {
-			HIGH_PIN_SEND_ZERO(pin_mask);
-		}
-		if(data & DATA_MASK_B13){
-			HIGH_PIN_SEND_ONE(pin_mask);
-		} else {
-			HIGH_PIN_SEND_ZERO(pin_mask);
-		}
-		if(data & DATA_MASK_B14){
-			HIGH_PIN_SEND_ONE(pin_mask);
-		} else {
-			HIGH_PIN_SEND_ZERO(pin_mask);
-		}
-		if(data & DATA_MASK_B15){
-			HIGH_PIN_SEND_ONE(pin_mask);
-		} else {
-			HIGH_PIN_SEND_ZERO(pin_mask);
-		}
-		if(data & DATA_MASK_B16){
-			HIGH_PIN_SEND_ONE(pin_mask);
-		} else {
-			HIGH_PIN_SEND_ZERO(pin_mask);
-		}
-		if(data & DATA_MASK_B17){
-			HIGH_PIN_SEND_ONE(pin_mask);
-		} else {
-			HIGH_PIN_SEND_ZERO(pin_mask);
-		}
-		if(data & DATA_MASK_B18){
-			HIGH_PIN_SEND_ONE(pin_mask);
-		} else {
-			HIGH_PIN_SEND_ZERO(pin_mask);
-		}
-		if(data & DATA_MASK_B19){
-			HIGH_PIN_SEND_ONE(pin_mask);
-		} else {
-			HIGH_PIN_SEND_ZERO(pin_mask);
-		}
-		if(data & DATA_MASK_B20){
-			HIGH_PIN_SEND_ONE(pin_mask);
-		} else {
-			HIGH_PIN_SEND_ZERO(pin_mask);
-		}
-		if(data & DATA_MASK_B21){
-			HIGH_PIN_SEND_ONE(pin_mask);
-		} else {
-			HIGH_PIN_SEND_ZERO(pin_mask);
-		}
-		if(data & DATA_MASK_B22){
-			HIGH_PIN_SEND_ONE(pin_mask);
-		} else {
-			HIGH_PIN_SEND_ZERO(pin_mask);
-		}
-		if(data & DATA_MASK_B23){
-			HIGH_PIN_SEND_ONE(pin_mask);
-		} else {
-			HIGH_PIN_SEND_ZERO(pin_mask);
-		}
+	// 	if(data & DATA_MASK_B0){
+	// 		LOW_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		LOW_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B1){
+	// 		LOW_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		LOW_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B2){
+	// 		LOW_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		LOW_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B3){
+	// 		LOW_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		LOW_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B4){
+	// 		LOW_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		LOW_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B5){
+	// 		LOW_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		LOW_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B6){
+	// 		LOW_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		LOW_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B7){
+	// 		LOW_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		LOW_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B8){
+	// 		LOW_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		LOW_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B9){
+	// 		LOW_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		LOW_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B10){
+	// 		LOW_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		LOW_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B11){
+	// 		LOW_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		LOW_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B12){
+	// 		LOW_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		LOW_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B13){
+	// 		LOW_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		LOW_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B14){
+	// 		LOW_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		LOW_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B15){
+	// 		LOW_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		LOW_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B16){
+	// 		LOW_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		LOW_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B17){
+	// 		LOW_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		LOW_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B18){
+	// 		LOW_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		LOW_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B19){
+	// 		LOW_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		LOW_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B20){
+	// 		LOW_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		LOW_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B21){
+	// 		LOW_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		LOW_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B22){
+	// 		LOW_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		LOW_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B23){
+	// 		LOW_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		LOW_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// } else {
+	// 	pin_mask = (1 << (pin - 32));
+	// 	if(data & DATA_MASK_B0){
+	// 		HIGH_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		HIGH_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B1){
+	// 		HIGH_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		HIGH_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B2){
+	// 		HIGH_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		HIGH_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B3){
+	// 		HIGH_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		HIGH_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B4){
+	// 		HIGH_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		HIGH_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B5){
+	// 		HIGH_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		HIGH_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B6){
+	// 		HIGH_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		HIGH_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B7){
+	// 		HIGH_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		HIGH_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B8){
+	// 		HIGH_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		HIGH_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B9){
+	// 		HIGH_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		HIGH_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B10){
+	// 		HIGH_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		HIGH_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B11){
+	// 		HIGH_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		HIGH_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B12){
+	// 		HIGH_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		HIGH_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B13){
+	// 		HIGH_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		HIGH_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B14){
+	// 		HIGH_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		HIGH_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B15){
+	// 		HIGH_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		HIGH_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B16){
+	// 		HIGH_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		HIGH_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B17){
+	// 		HIGH_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		HIGH_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B18){
+	// 		HIGH_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		HIGH_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B19){
+	// 		HIGH_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		HIGH_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B20){
+	// 		HIGH_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		HIGH_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B21){
+	// 		HIGH_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		HIGH_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B22){
+	// 		HIGH_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		HIGH_PIN_SEND_ZERO(pin_mask);
+	// 	}
+	// 	if(data & DATA_MASK_B23){
+	// 		HIGH_PIN_SEND_ONE(pin_mask);
+	// 	} else {
+	// 		HIGH_PIN_SEND_ZERO(pin_mask);
+	// 	}
 	}
 	
 	// for(bit_count = 0; bit_count < 24; ++bit_count) {

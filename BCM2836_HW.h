@@ -74,6 +74,8 @@
 #define GPIO_ALT4		3
 #define GPIO_ALT5		2
 
+
+
 /************************************
  *      System Timer Registers      *
  ************************************/
@@ -116,6 +118,36 @@
 #define ARM_LOCAL_TMR_CTL	HW_IO(ARM_BASE + 0x34)				/* Local timer control & status */
 #define ARM_LOCAL_TMR_IRQ	HW_IO(ARM_BASE + 0x38)				/* Local timer IRQ clear & reload */
 #define ARM_LOCAL_INT		HW_IO(ARM_BASE + 0x24)				/* Local interrupt routing */
+
+/***************************
+ *      PWM Registers      *
+ ***************************/
+#define PWM_CTL		HW_IO(PWM_BASE)			/* PWM Control */
+#define PWM_STA		HW_IO(PWM_BASE + 0x4)	/* PWM Status */
+#define PWM_DMAC	HW_IO(PWM_BASE + 0x8)	/* PWM DMA Configuration */
+#define PWM_RNG1	HW_IO(PWM_BASE + 0x10)	/* PWM Channel 1 Range */
+#define PWM_DAT1	HW_IO(PWM_BASE + 0x14)	/* PWM Channel 1 Data */
+#define PWM_FIF1	HW_IO(PWM_BASE + 0x18)	/* PWM FIFO Input */
+#define PWM_RNG2	HW_IO(PWM_BASE + 0x20)	/* PWM Channel 2 Range */
+#define PWM_DAT2	HW_IO(PWM_BASE + 0x24)	/* PWM Channel 2 Data */
+
+/* PWM Control bits */
+#define PWM_CTL_MSEN2	(1 << 15)	/* Channel 2 M/S Enable */
+#define PWM_CTL_USEF2	(1 << 13)	/* Channel 2 Use Fifo */
+#define PWM_CTL_POLA2	(1 << 12)	/* Channel 2 Polarity */
+#define PWM_CTL_SBIT2	(1 << 11)	/* Channel 2 Silence Bit */
+#define PWM_CTL_RPTL2	(1 << 10)	/* Channel 2 Repeat Last Data */
+#define PWM_CTL_MODE2	(1 << 9)	/* Channel 2 Mode */
+#define PWM_CTL_PWEN2	(1 << 8)	/* Channel 2 Enable */
+#define PWM_CTL_MSEN1	(1 << 7)	/* Channel 1 M/S Enable */
+#define PWM_CTL_CLRF1	(1 << 6)	/* Clear Fifo */
+#define PWM_CTL_USEF1	(1 << 5)	/* Channel 1 Use Fifo */
+#define PWM_CTL_POLA1	(1 << 4)	/* Channel 1 Polarity */
+#define PWM_CTL_SBIT1	(1 << 3)	/* Channel 1 Silence Bit */
+#define PWM_CTL_RPTL1	(1 << 2)	/* Channel 1 Repeat Last Data */
+#define PWM_CTL_MODE1	(1 << 1)	/* Channel 1 Mode */
+#define PWM_CTL_PWEN1	(1)			/* Channel 1 Enable */
+
 
 /*************************************************************************************/
 /*************************************************************************************/
