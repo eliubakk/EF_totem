@@ -9,7 +9,6 @@ extern void dummy ( unsigned int );
 
 //#define TIMEOUT 20000000
 #define ONE_SECOND 1000000 /* 1 Second = 1000000us */
-#define NUM_LED 1
 #define PWM_CHANNEL 0
 #define PWM_PIN 18
 

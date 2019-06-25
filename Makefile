@@ -13,8 +13,8 @@ COPS = -Wall -Werror -O2 -nostdlib -nostartfiles -ffreestanding
 PROJECT_NAME = blinker04
 
 ASMS = vectors.s
-SRCS = BCM2836_HW.c WS2812B_LED_Drv.c pwm.c
-OBJS = vectors.o BCM2836_HW.o WS2812B_LED_Drv.o pwm.o $(PROJECT_NAME).o
+SRCS = BCM2836_HW.c WS2812B_LED_Drv.c
+OBJS = vectors.o BCM2836_HW.o WS2812B_LED_Drv.o $(PROJECT_NAME).o
 
 gcc : $(PROJECT_NAME).hex kernel.img
 

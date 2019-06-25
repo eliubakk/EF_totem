@@ -19,16 +19,11 @@
 #define LED_RESET_US	55	/* low more than 50us */
 #define LED_COLOR_BITS	24  /* Three colors, 8 bits each */
 
-/* 3 PWM bits needed for each bit of led color, and zero for 55us to reset */
-#define LED_PWM_BIT_COUNT(leds, freq) 	(((leds * LED_COLOR_BITS * 3) + ((LED_RESET_US * \
-                                    	(freq * 3)) / 1000000))
-
-// Pad out to the nearest uint32 + 32-bits for idle low/high times the number of channels
-#define LED_PWM_BYTE_COUNT(leds, freq)	(((((LED_PWM_BIT_COUNT(leds, freq) >> 3) & ~0x7) + 4) + 4))
-
 // PWM Symbol definitions
 #define PWM_ONE		0x6  /* 1 1 0 */
 #define PWM_ZERO	0x4  /* 1 0 0 */
+
+#define NUM_LED 1
 
 // #define DATA_MASK_B0 	0x00800000
 // #define DATA_MASK_B1 	0x00400000
@@ -64,12 +59,6 @@
 #define COLOR_YELLOW	0x0083A400
 #define COLOR_GREEN		0x00200000
 #define COLOR_RED		0x00002000
-
-typedef struct {
-	uint8_t		channel;	/* PWM channel */
-	uint8_t 	pin;		/* GPIO pin for PWM */
-	uint32_t	num_led;	/* Number of LEDS */
-} WS2812B_LED_config_t;
 
 #define HIGH_PIN_SEND_ONE(mask) ({ \
 	ARM_TIMER_CTL = 0x003E0002; \
@@ -118,6 +107,37 @@ typedef struct {
 	ARM_TIMER_LOD = (LED_ZERO_LOW); \
 	while(1) if(ARM_TIMER_RIS) break; \
 })
+
+typedef struct {
+	uint8_t		channel;	/* PWM channel */
+	uint8_t 	pin;		/* GPIO pin for PWM */
+	uint32_t	num_led;	/* Number of LEDS */
+} WS2812B_LED_config_t;
+
+/* 3 PWM bits needed for each bit of led color, and zero for 55us to reset */
+#define PWM_BIT_COUNT(leds, freq) 	((leds * 24 * 3) + ((LED_RESET_US * \
+                                    	(freq * 3)) / 1000000))
+
+// Pad out to the nearest uint32 + 32-bits for idle low/high times the number of channels
+#define PWM_BYTE_COUNT(leds, freq)	(((((PWM_BIT_COUNT(leds, freq) >> 3) & ~0x7) + 4) + 4))
+
+#define PWM_DMA_CHANNEL 5
+
+volatile uint8_t led_raw[PWM_BYTE_COUNT(NUM_LED, LED_FREQ_HZ)];
+volatile dma_cb_t dma_cb;
+
+#define LED_RAW_ADDR 0xC0018000
+#define DMA_CB_ADDR  (LED_RAW_ADDR + PWM_BYTE_COUNT(NUM_LED, LED_FREQ_HZ))
+
+uint8_t pwm_serial_init(uint32_t freq, WS2812B_LED_config_t config);
+
+void pwm_deinit( void );
+
+uint8_t pwm_GPIO_init(uint8_t channel, uint8_t pin);
+
+void dma_start( void );
+
+uint8_t dma_wait( void );
 
 uint8_t WS2812B_LED_init(WS2812B_LED_config_t config);
 
