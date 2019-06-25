@@ -12,8 +12,12 @@
 #ifndef __PWM_H__
 #define __PWM_H__
 
-#include "BCM2836_HW.h"
+#include "stdint.h"
 
-uint8_t pwm_serial_init(uint32_t freq, uint8_t channel);
+uint8_t pwm_serial_init(uint32_t freq, uint8_t channel, uint8_t pin);
+
+void pwm_deinit( void );
+
+uint8_t pwm_GPIO_init(uint8_t channel, uint8_t pin);
 
 #endif

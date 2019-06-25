@@ -8,88 +8,75 @@ extern void dummy ( unsigned int );
 #include "WS2812B_LED_Drv.h"
 
 //#define TIMEOUT 20000000
-#define TIMEOUT 250000000
-#define NUM_LED 25
+#define ONE_SECOND 1000000 /* 1 Second = 1000000us */
+#define NUM_LED 1
+#define PWM_CHANNEL 0
+#define PWM_PIN 18
 
 //-------------------------------------------------------------------------
 int notmain ( void )
 {
     //volatile uint32_t timer_count;
-    uint32_t led_i;
+    //uint32_t led_i;
+    pin_config_t green_led;
+    pin_config_t red_led;
+    WS2812B_LED_config_t led_config;
+    uint32_t colors[3];
+    uint32_t color_i;
+    uint32_t leds[NUM_LED];
 
-    //GPIO 47 is Green LED
-    //GPIO 35 is Red LED
-    GPIO_configure(35, GPIO_OUTPUT);
-    GPIO_configure(17, GPIO_OUTPUT);
+    color_i = 0;
+    colors[0] = COLOR_GREEN;
+    colors[1] = COLOR_BLUE;
+    colors[2] = COLOR_RED;
 
-    //GPIO_clear(47);
-    GPIO_clear(35);
-    GPIO_set(35);
+    /* On board LEDs */
+    green_led = (pin_config_t){.pin = 47, .alt = GPIO_OUTPUT};
+    red_led = (pin_config_t){.pin = 35, .alt = GPIO_OUTPUT};
 
+    GPIO_configure(green_led);
+    GPIO_configure(red_led);
 
+    GPIO_clear(green_led.pin);
+    GPIO_clear(red_led.pin);
+    //GPIO_set(green_led.pin);
+
+    /* Set ARM Timer to 1Mhz */
     ARM_TIMER_CTL = 0x003E0002;
-    ARM_TIMER_LOD = (TIMEOUT - 1);
+    ARM_TIMER_LOD = (ONE_SECOND - 1);
     //ARM_TIMER_RLD = (TIMEOUT-1);
-    //PUT32(ARM_TIMER_DIV, 0x000000F9);
-    //PUT32(ARM_TIMER_CTL, 0x00000002);
-    ARM_TIMER_DIV = 0x00000000;
+    ARM_TIMER_DIV = 0x000000F9;
     ARM_TIMER_CLI = 0;
     ARM_TIMER_CTL = 0x003E0082;
 
-    //PUT32(ARM_CORE_TMR_SCALE, 0x80000000);
-    GPIO_clear(17);
-    ARM_TIMER_LOD = (LED_RESET);
-    ARM_TIMER_CLI = 0;
-    while(1) if(ARM_TIMER_RIS) break;
-    ARM_TIMER_CLI = 0;
+
+    /* WS2812B LED strip config */
+    led_config = (WS2812B_LED_config_t){.channel = PWM_CHANNEL,
+                                        .pin = PWM_PIN,
+                                        .num_led = NUM_LED};
+
+    usleep(ONE_SECOND * 5);
+
+    if(WS2812B_LED_init(led_config) != 0) {
+        GPIO_set(red_led.pin);
+    } else {
+        GPIO_set(green_led.pin);
+    }
 
     while(1)
     {
-        //GPIO_toggle(35);
-        //send_data(47, 0x0000FF00);
-        //GPIO_toggle(35);
-        //timer_count = SYSTIMER_COUNT;
-        //SYSTIMER_C_SET(1, timer_count + TIMEOUT);
-        //SYSTIMER_MATCH_CLR(1);
-        //while(1) if(SYSTIMER_MATCH(1)) break;
-        for(led_i = 0; led_i < NUM_LED; ++led_i){
-            send_data(17, COLOR_RED);
+        leds[0] = colors[color_i];
+        ++color_i;
+        if(color_i > 2) {
+            color_i = 0;
         }
-        ARM_TIMER_LOD = (TIMEOUT-1);
-        ARM_TIMER_CLI = 0;
-        while(1) if(ARM_TIMER_RIS) break;
-        ARM_TIMER_CLI = 0;
-        GPIO_toggle(35);
-        //GPIO_toggle(47);
-
-        //while(1) if(ARM_TIMER_RIS) break;
-        //ARM_TIMER_CLI = 0;
-        //GPIO_toggle(35);
-        //GPIO_toggle(47);
-
-        //GPIO_toggle(47);
-        //GPIO_toggle(35);
-        //while(1) if(GET32(ARM_TIMER_RIS)) break;
-        //PUT32(ARM_TIMER_CLI, 0);
-        //GPIO_toggle(47);
-        //GPIO_toggle(35);
-        //while(1) if(GET32(ARM_TIMER_RIS)) break;
-        //PUT32(ARM_TIMER_CLI, 0);
+        WS2812B_LED_refresh(led_config, leds);
+        //send_data(47, 0x0000FF00);
+        usleep(ONE_SECOND);
+        GPIO_toggle(red_led.pin);
+        //GPIO_toggle(green_led.pin);
     }
     return(0);
 }
 //-------------------------------------------------------------------------
-//-------------------------------------------------------------------------
-
-
-//-------------------------------------------------------------------------
-//
-// Copyright (c) 2012 David Welch dwelch@dwelch.com
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
 //-------------------------------------------------------------------------

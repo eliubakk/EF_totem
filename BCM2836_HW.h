@@ -28,6 +28,7 @@
 #define GPIO_BASE	(P_BASE + 0x00200000)
 #define SPI0_BASE	(P_BASE + 0x204000)
 #define PWM_BASE	(P_BASE + 0x20c000)
+#define CM_CLK_BASE	(P_BASE + 0x101070)
 
 /* Timer base adderesses */
 #define SYS_TIMER_BASE	(P_BASE + 0x3000) 
@@ -74,7 +75,10 @@
 #define GPIO_ALT4		3
 #define GPIO_ALT5		2
 
-
+typedef struct {
+	uint8_t pin;
+	uint8_t alt;
+} pin_config_t;
 
 /************************************
  *      System Timer Registers      *
@@ -84,9 +88,10 @@
 #define SYS_TIMER_CHI	HW_IO(SYS_TIMER_BASE + 0x8)					/* System Timer Counter Higher 32 bits */
 #define SYS_TIMER_C(n)	HW_IO(SYS_TIMER_BASE + 0xC + ((n) * 0x4))	/* System Timer Compare 0-3 */ 		
 
-/* System Timer values */
+/* System Clock values */
 #define SYS_TIMER_FREQ		250000000	/* 250MHz */
 #define SYS_TIMER_PERIOD_US	0.004		/* 0.004us/period */
+#define OSC_FREQ			19200000	/* 19.2MHz Crystal Oscillator */
 
 /*********************************
  *      Arm Timer Registers      *
@@ -148,6 +153,42 @@
 #define PWM_CTL_MODE1	(1 << 1)	/* Channel 1 Mode */
 #define PWM_CTL_PWEN1	(1)			/* Channel 1 Enable */
 
+#define PWM_STA_EMPT1	(1 << 1)	/* PWM FIFO Empty Flag */
+#define PWM_STA_FULL1	(1 << 0)	/* PWM FIFO Full Flag */
+
+/*************************************
+ *      Clock Manager Registers      *
+ *************************************/
+#define CM_CLK_GP0CTL	HW_IO(CM_CLK_BASE)			/* Clock Manager General Purpose Clocks Control 0 */
+#define CM_CLK_GP1CTL	HW_IO(CM_CLK_BASE + 0x8)	/* Clock Manager General Purpose Clocks Control 1 */
+#define CM_CLK_GP2CTL	HW_IO(CM_CLK_BASE + 0x10)	/* Clock Manager General Purpose Clocks Control 2 */
+#define CM_CLK_GP0DIV	HW_IO(CM_CLK_BASE + 0x4)	/* Clock Manager General Purpose Clocks Divisor 0 */
+#define CM_CLK_GP1DIV	HW_IO(CM_CLK_BASE + 0xC)	/* Clock Manager General Purpose Clocks Divisor 1 */
+#define CM_CLK_GP2DIV	HW_IO(CM_CLK_BASE + 0x14)	/* Clock Manager General Purpose Clocks Divisor 2 */
+#define CM_CLK_PCMCTL	HW_IO(CM_CLK_BASE + 0x28)	/* Clock Manager Audio Clocks Control PCM */
+#define CM_CLK_PWMCTL	HW_IO(CM_CLK_BASE + 0x30)	/* Clock Manager Audio Clocks Control PWM */
+#define CM_CLK_PCMDIV	HW_IO(CM_CLK_BASE + 0x2C)	/* Clock Manager Audio Clock Divisors PCM */
+#define CM_CLK_PWMDIV	HW_IO(CM_CLK_BASE + 0x34)	/* Clock Manager Audio Clock Divisors PWM */
+
+/* CM control bits */
+#define CM_CLK_CTL_PASSWD		(0x5a << 24)
+#define CM_CLK_CTL_MASH(val)	(((val) & 0x3) << 9)
+#define CM_CLK_CTL_FLIP			(1 << 8)
+#define CM_CLK_CTL_BUSY			(1 << 7)
+#define CM_CLK_CTL_KILL			(1 << 5)
+#define CM_CLK_CTL_ENAB			(1 << 4)
+#define CM_CLK_CTL_SRC_GND		(0 << 0)
+#define CM_CLK_CTL_SRC_OSC		(1 << 0)
+#define CM_CLK_CTL_SRC_TSTDBG0	(2 << 0)
+#define CM_CLK_CTL_SRC_TSTDBG1	(3 << 0)
+#define CM_CLK_CTL_SRC_PLLA		(4 << 0)
+#define CM_CLK_CTL_SRC_PLLC		(5 << 0)
+#define CM_CLK_CTL_SRC_PLLD		(6 << 0)
+#define CM_CLK_CTL_SRC_HDMIAUX	(7 << 0)
+
+#define CM_CLK_DIV_PASSWD		(0x5a << 24)
+#define CM_CLK_DIV_DIVI(val)	(((val) & 0xfff) << 12)
+#define CM_CLK_DIV_DIVF(val)	(((val) & 0xfff) << 0)
 
 /*************************************************************************************/
 /*************************************************************************************/
@@ -165,8 +206,11 @@ extern unsigned int GET32 ( unsigned int );
 #define SYS_TIMER_COUNT			SYS_TIMER_CLO
 #define SYS_TIMER_C_SET(n, val)	SYS_TIMER_C(n) = (val)
 
+/* System Timer Finction Definitions */
+void usleep(uint32_t usec);
+
 /* GPIO Function Definitions */
-void GPIO_configure(uint8_t pin, uint8_t mode);
+void GPIO_configure(pin_config_t config);
 
 void GPIO_set(uint8_t pin);
 

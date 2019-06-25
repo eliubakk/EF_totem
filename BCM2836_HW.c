@@ -12,19 +12,28 @@
 
 #include "BCM2836_HW.h"
 
+/* System Timer Finction Definitions */
+void usleep(uint32_t usec) {
+	volatile uint32_t timer_count;
 
-void GPIO_configure(uint8_t pin, uint8_t mode) {
+	timer_count = SYS_TIMER_COUNT;
+    SYS_TIMER_C_SET(1, timer_count + usec);
+    SYS_TIMER_MATCH_CLR(1);
+    while(1) if(SYS_TIMER_MATCH(1)) break;
+}
+
+void GPIO_configure(pin_config_t config) {
 	unsigned int reg;
 
-	reg = GPFSEL(pin / 10);
+	reg = GPFSEL(config.pin / 10);
 
 	/* clear mode bits */
-	reg &= ~(7 << (3 * (pin % 10))); 
+	reg &= ~(7 << (3 * (config.pin % 10))); 
 
 	/* set mode bits */
-    reg |= (mode << (3 * (pin % 10)));
+    reg |= (config.alt << (3 * (config.pin % 10)));
 
-    GPFSEL(pin / 10) = reg;
+    GPFSEL(config.pin / 10) = reg;
 }
 
 void GPIO_set(uint8_t pin) {

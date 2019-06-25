@@ -13,8 +13,8 @@ COPS = -Wall -Werror -O2 -nostdlib -nostartfiles -ffreestanding
 PROJECT_NAME = blinker04
 
 ASMS = vectors.s
-SRCS = blinker04.c BCM2836_HW.c WS2812B_LED_Drv.c
-OBJS = vectors.o BCM2836_HW.o WS2812B_LED_Drv.o $(PROJECT_NAME).o
+SRCS = BCM2836_HW.c WS2812B_LED_Drv.c pwm.c
+OBJS = vectors.o BCM2836_HW.o WS2812B_LED_Drv.o pwm.o $(PROJECT_NAME).o
 
 gcc : $(PROJECT_NAME).hex kernel.img
 
@@ -33,11 +33,12 @@ clean :
 $(patsubst %.s, %.o, $(ASMS)): %.o : %.s
 	$(ARMGNU)/as $^ -o $@
 
-$(patsubst %.c, %.o, $(SRCS)): %.o : %.c
-	$(GCC) $(COPS) -c $^ -o $@
+$(patsubst %.c, %.o, $(SRCS)): %.o : %.c %.h
+	$(GCC) $(COPS) -c $< -o $@
+	$(ARMGNU)/objdump -D $@ > $*.list
 
-# $(PROJECT_NAME).o : $(SRCS)
-# 	$(GCC) $(COPS) -c $(SRCS) -o $(PROJECT_NAME).o
+$(PROJECT_NAME).o : $(PROJECT_NAME).c
+	$(GCC) $(COPS) -c $^ -o $@
 
 $(PROJECT_NAME).elf : memmap $(OBJS) 
 	$(ARMGNU)/ld.bfd $(OBJS) -T memmap -o $(PROJECT_NAME).elf
