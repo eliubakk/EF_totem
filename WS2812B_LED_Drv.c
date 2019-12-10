@@ -9,12 +9,15 @@
 #include "WS2812B_LED_Drv.h"
 //#include "pwm.h"
 
+volatile uint8_t led_raw[PWM_BYTE_COUNT(NUM_LED, LED_FREQ_HZ)] __attribute__((section(".LED_RAW")));
+volatile dma_cb_t dma_cb __attribute__((section(".DMA_CB")));
+
 uint8_t pwm_serial_init(uint32_t freq, WS2812B_LED_config_t config) {
 	uint32_t div;
 	int32_t byte_count;
-	int32_t word_count;
+	//int32_t word_count;
 	int32_t i;
-	volatile uint32_t *led_raw_local = (uint32_t *)led_raw;
+	//volatile uint32_t *led_raw_local = (uint32_t *)led_raw;
 
 	/* Configure GPIO */
 	if(pwm_GPIO_init(config.channel, config.pin) != 0) {
@@ -27,9 +30,11 @@ uint8_t pwm_serial_init(uint32_t freq, WS2812B_LED_config_t config) {
 	/* Set up PWM clock */
 	div = 8; //OSC_FREQ / (3 * freq);
 	CM_CLK_PWMDIV = CM_CLK_DIV_PASSWD | CM_CLK_DIV_DIVI(div);
+	usleep(100);
 	CM_CLK_PWMCTL = CM_CLK_CTL_PASSWD | CM_CLK_CTL_SRC_OSC;
+	usleep(100);
 	CM_CLK_PWMCTL = CM_CLK_CTL_PASSWD | CM_CLK_CTL_SRC_OSC | CM_CLK_CTL_ENAB;
-	usleep(10);
+	usleep(100);
 
 	while(1) if(CM_CLK_PWMCTL & CM_CLK_CTL_BUSY) break;
 
@@ -58,22 +63,24 @@ uint8_t pwm_serial_init(uint32_t freq, WS2812B_LED_config_t config) {
 	};
 
 	byte_count = PWM_BYTE_COUNT(config.num_led, freq);
-	word_count = byte_count / sizeof(uint32_t);
-	for(i = 0; i < word_count; ++i) {
-		led_raw_local[i] = 0x0;
+	//word_count = byte_count / sizeof(uint32_t);
+	for(i = 0; i < byte_count; ++i) {
+		led_raw[i] = 0;
 	}
 
-	dma_cb.ti = DMA_TI_NO_WIDE_BURSTS |
-				DMA_TI_WAIT_RESP |
-				DMA_TI_DEST_DREQ |
-				DMA_TI_PREMAP(5) |
-				DMA_TI_SRC_INC;
+	dma_cb.ti = (uint32_t)(DMA_TI_NO_WIDE_BURSTS |
+						   DMA_TI_WAIT_RESP |
+						   DMA_TI_DEST_DREQ |
+						   DMA_TI_PREMAP(DMA_DREQ_PWM) |
+						   DMA_TI_SRC_INC);
 
-	dma_cb.source_ad = (uint32_t)((uint8_t*)led_raw);
+	dma_cb.source_ad = (uint32_t)LED_RAW_ADDR;
 	dma_cb.dest_ad = (uint32_t)&PWM_FIF1;
 	dma_cb.txfr_len = byte_count;
 	dma_cb.stride = 0;
 	dma_cb.nextconbk = 0;
+	dma_cb.reserved[0] = 0;
+	dma_cb.reserved[1] = 0;
 
 	DMA_CS(PWM_DMA_CHANNEL) = 0;
 	DMA_TXFR_LEN(PWM_DMA_CHANNEL) = 0;
@@ -132,7 +139,7 @@ void dma_start( void ) {
 	DMA_CS(PWM_DMA_CHANNEL) = DMA_CS_INT | DMA_CS_END;
 	usleep(10);
 
-	DMA_CONBLK_AD(PWM_DMA_CHANNEL) = (uint32_t)&dma_cb;
+	DMA_CONBLK_AD(PWM_DMA_CHANNEL) = (uint32_t)DMA_CB_ADDR;
 	DMA_DEBUG(PWM_DMA_CHANNEL) = 7;
 	DMA_CS(PWM_DMA_CHANNEL) = DMA_CS_WAIT_OUTSTANDING_WRITES |
 							  DMA_CS_PANIC_PRIORITY(15) |
@@ -189,8 +196,7 @@ uint8_t WS2812B_LED_refresh(WS2812B_LED_config_t config, uint32_t *leds) {
 				--data_i;
 				if(data_i < 0) {
 					++word_i;
-					data_i = 31;
-				
+					data_i = 31;		
 				}
 			}
 		}

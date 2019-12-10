@@ -69,10 +69,14 @@ int notmain ( void )
         if(color_i > 2) {
             color_i = 0;
         }
-        WS2812B_LED_refresh(led_config, leds);
+        if(WS2812B_LED_refresh(led_config, leds) != 0) {
+            usleep(ONE_SECOND);
+            GPIO_toggle(green_led.pin);
+        } else {
+            usleep(ONE_SECOND);
+            GPIO_toggle(red_led.pin);
+        }
         //send_data(47, 0x0000FF00);
-        usleep(ONE_SECOND);
-        GPIO_toggle(red_led.pin);
         //GPIO_toggle(green_led.pin);
     }
     return(0);

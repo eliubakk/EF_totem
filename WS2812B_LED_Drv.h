@@ -115,19 +115,19 @@ typedef struct {
 } WS2812B_LED_config_t;
 
 /* 3 PWM bits needed for each bit of led color, and zero for 55us to reset */
-#define PWM_BIT_COUNT(leds, freq) 	((leds * 24 * 3) + ((LED_RESET_US * \
-                                    	(freq * 3)) / 1000000))
+#define PWM_BIT_COUNT(leds, freq) 	(((leds) * LED_COLOR_BITS * 3) \
+									+ ((LED_RESET_US * ((freq) * 3)) / 1000000))
 
 // Pad out to the nearest uint32 + 32-bits for idle low/high times the number of channels
 #define PWM_BYTE_COUNT(leds, freq)	(((((PWM_BIT_COUNT(leds, freq) >> 3) & ~0x7) + 4) + 4))
 
 #define PWM_DMA_CHANNEL 5
 
-volatile uint8_t led_raw[PWM_BYTE_COUNT(NUM_LED, LED_FREQ_HZ)];
-volatile dma_cb_t dma_cb;
+volatile extern uint8_t led_raw[PWM_BYTE_COUNT(NUM_LED, LED_FREQ_HZ)];
+volatile extern dma_cb_t dma_cb;
 
-#define LED_RAW_ADDR 0xC0018000
-#define DMA_CB_ADDR  (LED_RAW_ADDR + PWM_BYTE_COUNT(NUM_LED, LED_FREQ_HZ))
+#define LED_RAW_ADDR 0xC0019000
+#define DMA_CB_ADDR  0xC0018000
 
 uint8_t pwm_serial_init(uint32_t freq, WS2812B_LED_config_t config);
 

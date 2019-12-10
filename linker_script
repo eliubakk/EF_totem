@@ -1,0 +1,20 @@
+
+MEMORY
+{
+    ram : ORIGIN = 0x8000, LENGTH = 0x10000
+    dma : ORIGIN = 0x18000, LENGTH = 0x1000
+    led : ORIGIN = 0x19000, LENGTH = 0x1000
+}
+
+SECTIONS
+{
+    .text : { *(.text*) } > ram
+    .DMA_CB 0x18000 :
+    { 
+    	*(.DMA_CB*);
+    } > dma
+    .LED_RAW 0x19000 :
+    {
+    	*(.LED_RAW*);
+    } > led
+}

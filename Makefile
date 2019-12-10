@@ -11,6 +11,7 @@ AOPS = --warn --fatal-warnings
 COPS = -Wall -Werror -O2 -nostdlib -nostartfiles -ffreestanding 
 
 PROJECT_NAME = blinker04
+LINK_SCRIPT = linker_script
 
 ASMS = vectors.s
 SRCS = BCM2836_HW.c WS2812B_LED_Drv.c
@@ -40,8 +41,8 @@ $(patsubst %.c, %.o, $(SRCS)): %.o : %.c %.h
 $(PROJECT_NAME).o : $(PROJECT_NAME).c
 	$(GCC) $(COPS) -c $^ -o $@
 
-$(PROJECT_NAME).elf : memmap $(OBJS) 
-	$(ARMGNU)/ld.bfd $(OBJS) -T memmap -o $(PROJECT_NAME).elf
+$(PROJECT_NAME).elf : $(LINK_SCRIPT) $(OBJS) 
+	$(ARMGNU)/ld.bfd $(OBJS) -T $(LINK_SCRIPT) -o $(PROJECT_NAME).elf
 	$(ARMGNU)/objdump -D $(PROJECT_NAME).elf > $(PROJECT_NAME).list
 
 $(PROJECT_NAME).bin : $(PROJECT_NAME).elf
