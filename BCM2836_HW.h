@@ -120,7 +120,7 @@ typedef struct cm_cfg
 {
 	CM_periph_t		periph;		/* Peripheral clock to configure */
 	CM_clk_src_t	clk_src;	/* Source of clock */
-	CM_freq_t		period;		/* Period of Output clock in microseconds */
+	CM_period_t		period;		/* Period of Output clock in microseconds */
 } CM_config_t;
 
 /**************** GPIO ****************/

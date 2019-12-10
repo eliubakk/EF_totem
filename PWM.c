@@ -86,14 +86,69 @@
  *    CODE                                                                           *
  *************************************************************************************/
 
-uint8_t PWM_init(PWM_config_t config)
+uint8_t PWM_init(PWM_config_t cfg)
 {
-	
+	uint8_t i;
+	uint8_t ret;
+	GPIO_pin_t pwm_pins[2][4];
+	CM_config_t clk_cfg;
+
+	ret = 0;
+
+	pwm_pins[0][0] = (GPIO_pin_t){.num = 12, .alt = GPIO_ALT0};
+	pwm_pins[0][1] = (GPIO_pin_t){.num = 18, .alt = GPIO_ALT5};
+	pwm_pins[0][2] = (GPIO_pin_t){.num = 40, .alt = GPIO_ALT0};
+	pwm_pins[0][3] = (GPIO_pin_t){.num = 52, .alt = GPIO_ALT1};
+	pwm_pins[1][0] = (GPIO_pin_t){.num = 13, .alt = GPIO_ALT0};
+	pwm_pins[1][1] = (GPIO_pin_t){.num = 19, .alt = GPIO_ALT5};
+	pwm_pins[1][2] = (GPIO_pin_t){.num = 41, .alt = GPIO_ALT0};
+	pwm_pins[1][3] = (GPIO_pin_t){.num = 45, .alt = GPIO_ALT0};
+
+	/* Check if channel is allowed */
+	if(cfg.channel > 1)
+	{
+		ret = 1;
+	}
+
+	/* Check if pin is allowed for given channel, and configure GPIO */
+	if(ret == 0)
+	{
+		ret = 1;
+		for(i = 0; i < 4; ++i)
+		{
+			if(pwm_pins[cfg.channel][i].num == cfg.port)
+			{
+				GPIO_configure(pwm_pins[cfg.channel][i]);
+				ret = 0;
+				break;
+			}
+		}
+	}
+
+	/* Enable clock if pin was configured */
+	if(ret == 0)
+	{
+		clk_cfg.periph = CM_PWM;
+		clk_cfg.clk_src = SRC_OSC;
+		clk_cfg.period = cfg.period;
+		ret = CM_init(clk_cfg);
+	}
+
+	return ret;
 }
 
 void PWM_deinit(void)
 {
-	
+	CM_config_t clk_cfg;
+
+	clk_cfg.periph = CM_PWM;
+
+	/* Turn off PWM */
+	PWM_CTL = 0;
+	usleep(10);
+
+	/* Turn off Clock */
+	CM_deinit(clk_cfg);
 }
 
 /*************************************************************************************/
