@@ -14,7 +14,7 @@ PROJECT_NAME = blinker04
 LINK_SCRIPT = linker_script
 
 ASMS = vectors.s
-SRCS = BCM2836_HW.c WS2812B_LED_Drv.c
+SRCS = BCM2836_HW.c PWM.c
 OBJS = vectors.o BCM2836_HW.o WS2812B_LED_Drv.o $(PROJECT_NAME).o
 
 gcc : $(PROJECT_NAME).hex kernel.img

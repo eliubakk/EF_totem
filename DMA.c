@@ -106,5 +106,41 @@
  *    CODE                                                                           *
  *************************************************************************************/
 
+void DMA_init( void )
+{
+
+}
+
+void DMA_start( void )
+{
+	DMA_CS(DMA_DREQ_PWM) = DMA_CS_RESET;
+	usleep(10);
+
+	DMA_CS(DMA_DREQ_PWM) = DMA_CS_INT | DMA_CS_END;
+	usleep(10);
+
+	DMA_CONBLK_AD(DMA_DREQ_PWM) = (uint32_t)DMA_CB_ADDR;
+	DMA_DEBUG(DMA_DREQ_PWM) = 7;
+	DMA_CS(DMA_DREQ_PWM) = DMA_CS_WAIT_OUTSTANDING_WRITES |
+							  DMA_CS_PANIC_PRIORITY(15) |
+							  DMA_CS_PRIORITY(15) |
+							  DMA_CS_ACTIVE;
+}
+
+uint8_t DMA_wait( void )
+{
+	while(    ( DMA_CS(DMA_DREQ_PWM) & DMA_CS_ACTIVE )
+		  && !( DMA_CS(DMA_DREQ_PWM) & DMA_CS_ERROR  ) )
+	{
+		usleep(10);
+	}
+
+	if( DMA_CS(DMA_DREQ_PWM) & DMA_CS_ERROR )
+	{
+		return 1;
+	}
+
+	return 0;
+}
 
 /*************************************************************************************/

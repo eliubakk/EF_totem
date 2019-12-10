@@ -134,6 +134,39 @@ uint8_t PWM_init(PWM_config_t cfg)
 		ret = CM_init(clk_cfg);
 	}
 
+	/* TODO: Add option for non-serial data transfer? */
+	if(ret == 0)
+	{
+		/* Set up module for serial data transfer */
+		PWM_RNG1 = 32;
+		usleep(10);
+
+		PWM_CTL = PWM_CTL_CLRF1;
+		usleep(10);
+
+		PWM_DMAC = PWM_DMAC_ENAB | PWM_DMAC_PANIC(7) | PWM_DMAC_DREQ(3);
+		usleep(10);
+
+		switch(cfg.channel){
+			case 0: {
+				PWM_CTL = PWM_CTL_USEF1 | PWM_CTL_MODE1;
+				usleep(10);
+
+				PWM_CTL |= PWM_CTL_PWEN1;
+				break;
+			}
+			case 1: {
+				PWM_CTL = PWM_CTL_USEF2 | PWM_CTL_MODE2;
+				usleep(10);
+
+				PWM_CTL |= PWM_CTL_PWEN2;
+				break;
+			}
+			default:
+				ret = 1;
+		};
+	}
+	
 	return ret;
 }
 

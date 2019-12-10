@@ -43,15 +43,15 @@
  *    TYPE/ENUM DEFINITIONS                                                          *
  *************************************************************************************/
 
-typedef uint8_t			PWM_channel_t;
-typedef uint8_t			PWM_port_t;
-typedef unsigned float	PWM_period_t;
+typedef uint8_t		PWM_channel_t;
+typedef uint8_t		PWM_port_t;
+typedef float		PWM_period_t;
 
 typedef struct pwm_config
 {
-	PWM_period_t    period;
 	PWM_channel_t 	channel;
 	PWM_port_t    	port;
+	PWM_period_t    period;
 } PWM_config_t;
 
 /*************************************************************************************

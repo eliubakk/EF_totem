@@ -65,7 +65,7 @@
  *************************************************************************************/
 
 /* Register Access Macros */
-#define HW_IO_TYPE(type, addr)	(*(volatile type*)(n))
+#define HW_IO_TYPE(type, addr)	(*(volatile type*)(addr))
 
 /* Type Specific Register Access Macros */
 #define HW_IO_U8(n)		HW_IO_TYPE(uint8_t, n)
@@ -113,7 +113,7 @@ typedef enum cm_clk_src
 	SRC_HDMIAUX,	/* 5 */
 } CM_clk_src_t;
 
-typedef unsigned float	CM_period_t;
+typedef float	CM_period_t;
 
 /* Peripheral Clock Config */
 typedef struct cm_cfg

@@ -16,6 +16,7 @@ uint8_t pwm_serial_init(uint32_t freq, WS2812B_LED_config_t config) {
 	uint32_t div;
 	int32_t byte_count;
 	//int32_t word_count;
+	uint8_t ret;
 	int32_t i;
 	PWM_config_t pwm_cfg;
 
@@ -28,85 +29,39 @@ uint8_t pwm_serial_init(uint32_t freq, WS2812B_LED_config_t config) {
 	PWM_deinit();
 
 	/* Init PWM gpio and clock */
-	PWM_init(pwm_cfg);
+	ret = PWM_init(pwm_cfg);
 
-	/* Set up PWM module for serial data transfer */
-	PWM_RNG1 = 32;
-	usleep(10);
-	PWM_CTL = PWM_CTL_CLRF1;
-	usleep(10);
-	PWM_DMAC = PWM_DMAC_ENAB | PWM_DMAC_PANIC(7) | PWM_DMAC_DREQ(3);
-	usleep(10);
-	switch(config.channel){
-		case 0: {
-			PWM_CTL = PWM_CTL_USEF1 | PWM_CTL_MODE1;
-			usleep(10);
-			PWM_CTL |= PWM_CTL_PWEN1;
-			break;
+	if(ret == 0)
+	{
+		byte_count = PWM_BYTE_COUNT(config.num_led, freq);
+		//word_count = byte_count / sizeof(uint32_t);
+		for(i = 0; i < byte_count; ++i)
+		{
+			led_raw[i] = 0;
 		}
-		case 1: {
-			PWM_CTL = PWM_CTL_USEF2 | PWM_CTL_MODE2;
-			usleep(10);
-			PWM_CTL |= PWM_CTL_PWEN2;
-			break;
-		}
-		default:
-			return 1;
-	};
 
-	byte_count = PWM_BYTE_COUNT(config.num_led, freq);
-	//word_count = byte_count / sizeof(uint32_t);
-	for(i = 0; i < byte_count; ++i) {
-		led_raw[i] = 0;
+		dma_cb.ti = (uint32_t)(DMA_TI_NO_WIDE_BURSTS |
+							   DMA_TI_WAIT_RESP |
+							   DMA_TI_DEST_DREQ |
+							   DMA_TI_PREMAP(DMA_DREQ_PWM) |
+							   DMA_TI_SRC_INC);
+
+		dma_cb.source_ad = (uint32_t)LED_RAW_ADDR;
+		dma_cb.dest_ad = (uint32_t)&PWM_FIF1;
+		dma_cb.txfr_len = byte_count;
+		dma_cb.stride = 0;
+		dma_cb.nextconbk = 0;
+		dma_cb.reserved[0] = 0;
+		dma_cb.reserved[1] = 0;
+
+		DMA_CS(PWM_DMA_CHANNEL) = 0;
+		DMA_TXFR_LEN(PWM_DMA_CHANNEL) = 0;
 	}
-
-	dma_cb.ti = (uint32_t)(DMA_TI_NO_WIDE_BURSTS |
-						   DMA_TI_WAIT_RESP |
-						   DMA_TI_DEST_DREQ |
-						   DMA_TI_PREMAP(DMA_DREQ_PWM) |
-						   DMA_TI_SRC_INC);
-
-	dma_cb.source_ad = (uint32_t)LED_RAW_ADDR;
-	dma_cb.dest_ad = (uint32_t)&PWM_FIF1;
-	dma_cb.txfr_len = byte_count;
-	dma_cb.stride = 0;
-	dma_cb.nextconbk = 0;
-	dma_cb.reserved[0] = 0;
-	dma_cb.reserved[1] = 0;
-
-	DMA_CS(PWM_DMA_CHANNEL) = 0;
-	DMA_TXFR_LEN(PWM_DMA_CHANNEL) = 0;
-
-	return 0;
+	
+	return ret;
 }
 
-void dma_start( void ) {
-	DMA_CS(PWM_DMA_CHANNEL) = DMA_CS_RESET;
-	usleep(10);
 
-	DMA_CS(PWM_DMA_CHANNEL) = DMA_CS_INT | DMA_CS_END;
-	usleep(10);
-
-	DMA_CONBLK_AD(PWM_DMA_CHANNEL) = (uint32_t)DMA_CB_ADDR;
-	DMA_DEBUG(PWM_DMA_CHANNEL) = 7;
-	DMA_CS(PWM_DMA_CHANNEL) = DMA_CS_WAIT_OUTSTANDING_WRITES |
-							  DMA_CS_PANIC_PRIORITY(15) |
-							  DMA_CS_PRIORITY(15) |
-							  DMA_CS_ACTIVE;
-}
-
-uint8_t dma_wait( void ) {
-	while((DMA_CS(PWM_DMA_CHANNEL) & DMA_CS_ACTIVE) &&
-			!(DMA_CS(PWM_DMA_CHANNEL) & DMA_CS_ERROR)){
-		usleep(10);
-	}
-
-	if(DMA_CS(PWM_DMA_CHANNEL) & DMA_CS_ERROR){
-		return 1;
-	}
-
-	return 0;
-}
 
 uint8_t WS2812B_LED_init(WS2812B_LED_config_t config) {
 	if(pwm_serial_init(LED_FREQ_HZ, config) != 0) {

@@ -121,7 +121,6 @@ typedef struct {
 // Pad out to the nearest uint32 + 32-bits for idle low/high times the number of channels
 #define PWM_BYTE_COUNT(leds, freq)	(((((PWM_BIT_COUNT(leds, freq) >> 3) & ~0x7) + 4) + 4))
 
-#define PWM_DMA_CHANNEL 5
 
 volatile extern uint8_t led_raw[PWM_BYTE_COUNT(NUM_LED, LED_FREQ_HZ)];
 volatile extern dma_cb_t dma_cb;
@@ -130,14 +129,6 @@ volatile extern dma_cb_t dma_cb;
 #define DMA_CB_ADDR  0xC0018000
 
 uint8_t pwm_serial_init(uint32_t freq, WS2812B_LED_config_t config);
-
-void pwm_deinit( void );
-
-uint8_t pwm_GPIO_init(uint8_t channel, uint8_t pin);
-
-void dma_start( void );
-
-uint8_t dma_wait( void );
 
 uint8_t WS2812B_LED_init(WS2812B_LED_config_t config);
 

@@ -180,7 +180,7 @@ uint8_t CM_init(CM_config_t cfg)
 		}
 		case SRC_OSC:
 		{
-			div = (uint32_t)( ((CM_freq_t)OSC_FREQ_MHZ) * cfg.period );
+			div = (uint32_t)( OSC_FREQ_MHZ * cfg.period );
 			break;
 		}
 		case SRC_TSTDBG0:
@@ -189,6 +189,7 @@ uint8_t CM_init(CM_config_t cfg)
 		case SRC_PLLC:
 		case SRC_PLLD:
 		case SRC_HDMIAUX:
+		default:
 		{
 			/* Not implemented */
 			div = 1;
