@@ -17,26 +17,34 @@ uint8_t pwm_serial_init(uint32_t freq, WS2812B_LED_config_t config) {
 	int32_t byte_count;
 	//int32_t word_count;
 	int32_t i;
+	PWM_config_t pwm_cfg;
+
+	pwm_cfg.period = (PWM_period_t)(1.0 / (3 * freq));
+	pwm_cfg.channel = config.channel;
+	pwm_cfg.port = config.pin;
 	//volatile uint32_t *led_raw_local = (uint32_t *)led_raw;
 
+	PWM_deinit();
+
+	PWM_init(pwm_cfg);
 	/* Configure GPIO */
-	if(pwm_GPIO_init(config.channel, config.pin) != 0) {
-		return 1;
-	}
+	// if(pwm_GPIO_init(config.channel, config.pin) != 0) {
+	// 	return 1;
+	// }
 
-	/* Turn off PWM if already init */
-	pwm_deinit();
+	// /* Turn off PWM if already init */
+	// pwm_deinit();
 
-	/* Set up PWM clock */
-	div = 8; //OSC_FREQ / (3 * freq);
-	CM_CLK_PWMDIV = CM_CLK_DIV_PASSWD | CM_CLK_DIV_DIVI(div);
-	usleep(100);
-	CM_CLK_PWMCTL = CM_CLK_CTL_PASSWD | CM_CLK_CTL_SRC_OSC;
-	usleep(100);
-	CM_CLK_PWMCTL = CM_CLK_CTL_PASSWD | CM_CLK_CTL_SRC_OSC | CM_CLK_CTL_ENAB;
-	usleep(100);
+	// /* Set up PWM clock */
+	// div = 8; //OSC_FREQ / (3 * freq);
+	// CM_CLK_PWMDIV = CM_CLK_DIV_PASSWD | CM_CLK_DIV_DIVI(div);
+	// usleep(100);
+	// CM_CLK_PWMCTL = CM_CLK_CTL_PASSWD | CM_CLK_CTL_SRC_OSC;
+	// usleep(100);
+	// CM_CLK_PWMCTL = CM_CLK_CTL_PASSWD | CM_CLK_CTL_SRC_OSC | CM_CLK_CTL_ENAB;
+	// usleep(100);
 
-	while(1) if(CM_CLK_PWMCTL & CM_CLK_CTL_BUSY) break;
+	// while(1) if(CM_CLK_PWMCTL & CM_CLK_CTL_BUSY) break;
 
 	/* Set up PWM module for serial data transfer */
 	PWM_RNG1 = 32;
