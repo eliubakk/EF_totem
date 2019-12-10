@@ -101,16 +101,18 @@
 #define ARM_LOCAL_INT		HW_IO(ARM_BASE + 0x24)				/* Local interrupt routing */
 
 /* Clock Manager Registers */
-#define CM_CLK_GP0CTL	HW_IO(CM_CLK_BASE)			/* Clock Manager General Purpose Clocks Control 0 */
-#define CM_CLK_GP1CTL	HW_IO(CM_CLK_BASE + 0x8)	/* Clock Manager General Purpose Clocks Control 1 */
-#define CM_CLK_GP2CTL	HW_IO(CM_CLK_BASE + 0x10)	/* Clock Manager General Purpose Clocks Control 2 */
-#define CM_CLK_GP0DIV	HW_IO(CM_CLK_BASE + 0x4)	/* Clock Manager General Purpose Clocks Divisor 0 */
-#define CM_CLK_GP1DIV	HW_IO(CM_CLK_BASE + 0xC)	/* Clock Manager General Purpose Clocks Divisor 1 */
-#define CM_CLK_GP2DIV	HW_IO(CM_CLK_BASE + 0x14)	/* Clock Manager General Purpose Clocks Divisor 2 */
-#define CM_CLK_PCMCTL	HW_IO(CM_CLK_BASE + 0x28)	/* Clock Manager Audio Clocks Control PCM */
-#define CM_CLK_PWMCTL	HW_IO(CM_CLK_BASE + 0x30)	/* Clock Manager Audio Clocks Control PWM */
-#define CM_CLK_PCMDIV	HW_IO(CM_CLK_BASE + 0x2C)	/* Clock Manager Audio Clock Divisors PCM */
-#define CM_CLK_PWMDIV	HW_IO(CM_CLK_BASE + 0x34)	/* Clock Manager Audio Clock Divisors PWM */
+// #define CM_CLK_GP0CTL	HW_IO(CM_CLK_BASE)			/* Clock Manager General Purpose Clocks Control 0 */
+// #define CM_CLK_GP1CTL	HW_IO(CM_CLK_BASE + 0x8)	/* Clock Manager General Purpose Clocks Control 1 */
+// #define CM_CLK_GP2CTL	HW_IO(CM_CLK_BASE + 0x10)	/* Clock Manager General Purpose Clocks Control 2 */
+// #define CM_CLK_GP0DIV	HW_IO(CM_CLK_BASE + 0x4)	/* Clock Manager General Purpose Clocks Divisor 0 */
+// #define CM_CLK_GP1DIV	HW_IO(CM_CLK_BASE + 0xC)	/* Clock Manager General Purpose Clocks Divisor 1 */
+// #define CM_CLK_GP2DIV	HW_IO(CM_CLK_BASE + 0x14)	/* Clock Manager General Purpose Clocks Divisor 2 */
+// #define CM_CLK_PCMCTL	HW_IO(CM_CLK_BASE + 0x28)	/* Clock Manager Audio Clocks Control PCM */
+// #define CM_CLK_PWMCTL	HW_IO(CM_CLK_BASE + 0x30)	/* Clock Manager Audio Clocks Control PWM */
+// #define CM_CLK_PCMDIV	HW_IO(CM_CLK_BASE + 0x2C)	/* Clock Manager Audio Clock Divisors PCM */
+// #define CM_CLK_PWMDIV	HW_IO(CM_CLK_BASE + 0x34)	/* Clock Manager Audio Clock Divisors PWM */
+#define CM_CLK_CTL(n)	HW_IO(CM_CLK_BASE + ((n)*0x8))			/* Clock Manager Clocks Control */
+#define CM_CLK_DIV(n)	HW_IO(CM_CLK_BASE + ((n)*0x8) + 0x4)	/* Clock Manager Clock Divisor */
 
 /* CM Control Bits */
 #define CM_CLK_CTL_PASSWD		(0x5a << 24)
@@ -151,8 +153,9 @@
  *    CODE                                                                           *
  *************************************************************************************/
 
-/* System Timer Functions */
-void usleep(uint32_t usec) {
+/**************** SYSTEM TIMER ****************/
+void usleep(uint32_t usec)
+{
 	volatile uint32_t timer_count;
 
 	timer_count = SYS_TIMER_COUNT;
@@ -161,49 +164,131 @@ void usleep(uint32_t usec) {
     while(1) if(SYS_TIMER_MATCH(1)) break;
 }
 
-/* GPIO Functions */
-void GPIO_configure(pin_config_t config) {
-	unsigned int reg;
+/**************** CLOCK MANAGER ****************/
+uint8_t CM_init(CM_config_t cfg)
+{
+	uint32_t div;
+	uint8_t ret;
 
-	reg = GPFSEL(config.pin / 10);
+	ret = 0;
+	switch(cfg.clk_src)
+	{
+		case SRC_GND:
+		{
+			div = 1;
+			break;
+		}
+		case SRC_OSC:
+		{
+			div = (uint32_t)( ((CM_freq_t)OSC_FREQ_MHZ) * cfg.period );
+			break;
+		}
+		case SRC_TSTDBG0:
+		case SRC_TSTDBG1:
+		case SRC_PLLA:
+		case SRC_PLLC:
+		case SRC_PLLD:
+		case SRC_HDMIAUX:
+		{
+			/* Not implemented */
+			div = 1;
+			ret = 1;
+			break;
+		}
+	};
 
-	/* clear mode bits */
-	reg &= ~(7 << (3 * (config.pin % 10))); 
+	if(ret == 0)
+	{
+		/* Set peripheral clock divisor */
+		CM_CLK_DIV(cfg.periph) = CM_CLK_DIV_PASSWD | CM_CLK_DIV_DIVI(div);
+		usleep(100);
 
-	/* set mode bits */
-    reg |= (config.alt << (3 * (config.pin % 10)));
+		/* Set peripheral clock source */ 
+		CM_CLK_CTL(cfg.periph) = CM_CLK_CTL_PASSWD | cfg.clk_src;
+		usleep(100);
 
-    GPFSEL(config.pin / 10) = reg;
+		/* Enable peripheral clock */
+		CM_CLK_CTL(cfg.periph) = CM_CLK_CTL_PASSWD | cfg.clk_src | CM_CLK_CTL_ENAB;
+		usleep(100);
+
+		/* Wait until clock is busy (running) */
+		while(1) if(CM_CLK_CTL(cfg.periph) & CM_CLK_CTL_BUSY) break;
+	}
+	
+	return ret;
 }
 
-void GPIO_set(uint8_t pin) {
-	if(pin < 32) {
+void CM_deinit(CM_config_t cfg)
+{
+	/* Kill Clock */
+	CM_CLK_CTL(cfg.periph) = CM_CLK_CTL_PASSWD | CM_CLK_CTL_KILL;
+	usleep(10);
+
+	/* Wait until clock is not busy (off) */
+	while(1) if(!(CM_CLK_CTL(cfg.periph) & CM_CLK_CTL_BUSY)) break;
+}
+
+
+/**************** GPIO ****************/
+void GPIO_configure(GPIO_pin_t p)
+{
+	unsigned int reg;
+
+	reg = GPFSEL(p.num / 10);
+
+	/* clear mode bits */
+	reg &= ~(7 << (3 * (p.num % 10))); 
+
+	/* set mode bits */
+    reg |= (p.alt << (3 * (p.num % 10)));
+
+    GPFSEL(p.num / 10) = reg;
+}
+
+void GPIO_set(uint8_t pin)
+{
+	if(pin < 32)
+	{
 		GPSET0 = (1 << pin);
-	} else {
+	}
+	else
+	{
 		GPSET1 = (1 << (pin - 32));
 	}
 }
 
-void GPIO_clear(uint8_t pin) {
-	if(pin < 32) {
+void GPIO_clear(uint8_t pin)
+{
+	if(pin < 32)
+	{
 		GPCLR0 = (1 << pin);
-	} else {
+	}
+	else
+	{
 		GPCLR1 = (1 << (pin - 32));
 	}
 }
 
-uint8_t GPIO_level(uint8_t pin) {
-	if(pin < 32) {
+uint8_t GPIO_level(uint8_t pin)
+{
+	if(pin < 32)
+	{
 		return (1 & (GPLEV0 >> pin));
-	} else {
+	}
+	else
+	{
 		return (1 & (GPLEV1 >> (pin - 32)));
 	}
 }
 
-void GPIO_toggle(uint8_t pin) {
-	if(GPIO_level(pin)){
+void GPIO_toggle(uint8_t pin)
+{
+	if(GPIO_level(pin))
+	{
 		GPIO_clear(pin);
-	} else {
+	}
+	else
+	{
 		GPIO_set(pin);
 	}
 }

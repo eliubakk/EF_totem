@@ -11,7 +11,7 @@
 
 #include "BCM2836_HW.h"
 
-#define LED_FREQ_HZ		800000
+#define LED_FREQ_MHZ	0.8
 #define LED_ZERO_HIGH	15 //250000000		/* 0.4us / 0.004us = 100 clock periods, 400ns / 4ns = 100 clock periods */
 #define LED_ONE_HIGH	170 //500000000		/* 0.8us / 0.004us = 200 clock periods, 800ns / 4ns = 200 clock periods */
 #define LED_ZERO_LOW	150 //250000000		/* 0.85us / 0.004us = 212.5 clock periods, 850ns / 4ns = 212.5 clock periods */

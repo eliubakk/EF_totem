@@ -53,10 +53,12 @@
 /* UART */
 /* USB */
 
-/* System Clock values */
-#define SYS_TIMER_FREQ		250000000	/* 250MHz */
+/* Default Clock Source Values */
+#define OSC_FREQ_MHZ		19.2		/* 19.2MHz Crystal Oscillator */
+#define OSC_PERIOD			
+#define SYS_TIMER_FREQ_MHZ	250	    	/* 250MHz */
 #define SYS_TIMER_PERIOD_US	0.004		/* 0.004us/period */
-#define OSC_FREQ			19200000	/* 19.2MHz Crystal Oscillator */
+
 
 /*************************************************************************************
  *    MACROS                                                                         *
@@ -84,10 +86,49 @@
  *    TYPE/ENUM DEFINITIONS                                                          *
  *************************************************************************************/
 
-/* GPIO Function Select Values */
-typedef enum 
+/**************** CLOCK MANAGER ****************/
+
+/* Peripherials */
+typedef enum cm_periph
 {
-	GPIO_INPUT,		/* 0 */
+	CM_GP0 = 0,	/* 0 - General Purpose Clock 0 */
+	CM_GP1,		/* 1 - General Purpose Clock 1 */
+	CM_GP2,		/* 2 - General Purpose Clock 2 */
+	/* 3 */		/* unknown at this point */
+	/* 4 */		/* unknown at this point */
+	CM_PCM = 5,	/* 5 - Audio Clock, PCM */
+	CM_PWM		/* 6 - Audio Clock, PWM */
+} CM_periph_t;
+
+/* Clock Sources */
+typedef enum cm_clk_src
+{
+	SRC_GND = 0,	/* 0 */
+	SRC_OSC,		/* 1 - 19.2MHz Crystal Oscillator */
+	SRC_TSTDBG0,	/* 2 - ? */
+	SRC_TSTDBG1,	/* 3 - ? */
+	SRC_PLLA,		/* 4 */
+	SRC_PLLC,		/* 5 */
+	SRC_PLLD,		/* 6 */
+	SRC_HDMIAUX,	/* 5 */
+} CM_clk_src_t;
+
+typedef unsigned float	CM_period_t;
+
+/* Peripheral Clock Config */
+typedef struct cm_cfg
+{
+	CM_periph_t		periph;		/* Peripheral clock to configure */
+	CM_clk_src_t	clk_src;	/* Source of clock */
+	CM_freq_t		period;		/* Period of Output clock in microseconds */
+} CM_config_t;
+
+/**************** GPIO ****************/
+
+/* Function Select Values */
+typedef enum gpio_alt
+{
+	GPIO_INPUT = 0,	/* 0 */
 	GPIO_OUTPUT,	/* 1 */
 	GPIO_ALT5,		/* 2 */
 	GPIO_ALT4,		/* 3 */
@@ -95,12 +136,14 @@ typedef enum
 	GPIO_ALT1,		/* 5 */
 	GPIO_ALT2,		/* 6 */
 	GPIO_ALT3		/* 7 */
-} pin_alt_t;
+} GPIO_alt_t;
 
-typedef struct {
-	uint8_t		pin;
-	pin_alt_t	alt;
-} pin_config_t;
+/* Pin Type */
+typedef struct gpio_pin
+{
+	uint8_t		num;
+	GPIO_alt_t	alt;
+} GPIO_pin_t;
 
 /*************************************************************************************
  *    GLOBAL VARIABLES                                                               *
@@ -114,11 +157,17 @@ typedef struct {
 extern void PUT32 ( unsigned int, unsigned int );
 extern unsigned int GET32 ( unsigned int );
 
-/* System Timer Finction Definitions */
+/**************** SYSTEM TIMER ****************/
 void usleep(uint32_t usec);
 
-/* GPIO Function Definitions */
-void GPIO_configure(pin_config_t config);
+/**************** CLOCK MANAGER ****************/
+uint8_t CM_init(CM_config_t cfg);
+
+void CM_deinit(CM_config_t cfg);
+
+
+/**************** GPIO ****************/
+void GPIO_configure(GPIO_pin_t p);
 
 void GPIO_set(uint8_t pin);
 

@@ -43,6 +43,16 @@
  *    TYPE/ENUM DEFINITIONS                                                          *
  *************************************************************************************/
 
+typedef uint8_t		PWM_channel_t;
+typedef uint8_t		PWM_port_t;
+typedef uint32_t	PWM_freq_t;
+
+typedef struct pwm_config
+{
+	PWM_freq_t    freq;
+	PWM_channel_t channel;
+	PWM_port_t    port;
+} PWM_config_t;
 
 /*************************************************************************************
  *    GLOBAL VARIABLES                                                               *
@@ -53,6 +63,9 @@
  *    GLOBAL FUNCTION PROTOTYPES                                                     *
  *************************************************************************************/
 
+uint8_t PWM_init(PWM_config_t config);
+
+void PWM_deinit(void);
 
 /*************************************************************************************/
 
