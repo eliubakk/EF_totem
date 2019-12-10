@@ -160,22 +160,24 @@ extern unsigned int GET32 ( unsigned int );
 /**************** SYSTEM TIMER ****************/
 void usleep(uint32_t usec);
 
+/**************** ARM TIMER ****************/
+void ARM_timer_init(uint32_t load_val);
+
 /**************** CLOCK MANAGER ****************/
 uint8_t CM_init(CM_config_t cfg);
 
 void CM_deinit(CM_config_t cfg);
 
-
 /**************** GPIO ****************/
 void GPIO_configure(GPIO_pin_t p);
 
-void GPIO_set(uint8_t pin);
+void GPIO_set(GPIO_pin_t p);
 
-void GPIO_clear(uint8_t pin);
+void GPIO_clear(GPIO_pin_t p);
 
-uint8_t GPIO_level(uint8_t pin);
+uint8_t GPIO_level(GPIO_pin_t p);
 
-void GPIO_toggle(uint8_t pin);
+void GPIO_toggle(GPIO_pin_t p);
 
 /*************************************************************************************/
 

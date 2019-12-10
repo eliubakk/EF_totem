@@ -76,9 +76,6 @@
 #define DMA_TI_TDMODE						(1 << 1)
 #define DMA_TI_INTEN						(1 << 0)
 
-/* DMA DREQ Peripheral Assignments */
-#define DMA_DREQ_PWM						5
-
 /* DMA transfer length bits */
 #define DMA_TXFR_LEN_YLENGTH(val)			(((val) & 0xffff) << 16)
 #define DMA_TXFR_LEN_XLENGTH(val)			(((val) & 0xffff) << 0)
@@ -86,6 +83,9 @@
 /* DMA stride bits */
 #define DMA_STRIDE_D_STRIDE(val)			(((val) & 0xffff) << 16)
 #define DMA_STRIDE_S_STRIDE(val)			(((val) & 0xffff) << 0)
+
+
+#define DMA_CB_ADDR  0xC0018000
 
 /*************************************************************************************
  *    LOCAL VARIABLES                                                                *
@@ -96,6 +96,7 @@
  *    GLOBAL VARIABLE DECLARATIONS                                                   *
  *************************************************************************************/
 
+volatile dma_cb_t dma_cb __attribute__((section(".DMA_CB")));
 
 /*************************************************************************************
  *    LOCAL FUNCTION PROTOTYPES                                                      *
@@ -106,36 +107,59 @@
  *    CODE                                                                           *
  *************************************************************************************/
 
-void DMA_init( void )
+uint8_t DMA_init( DMA_channel_t channel, uint32_t source_addr, uint32_t dest_addr, uint32_t tx_len )
 {
+	if(channel != DMA_DREQ_PWM)
+	{
+		/* Only support PWM for now */
+		return 1;
+	}
 
+	dma_cb.ti = (uint32_t)(DMA_TI_NO_WIDE_BURSTS |
+						   DMA_TI_WAIT_RESP |
+						   DMA_TI_DEST_DREQ |
+						   DMA_TI_PREMAP(channel) |
+						   DMA_TI_SRC_INC);
+
+	dma_cb.source_ad = source_addr;
+	dma_cb.dest_ad = dest_addr;
+	dma_cb.txfr_len = tx_len;
+	dma_cb.stride = 0;
+	dma_cb.nextconbk = 0;
+	dma_cb.reserved[0] = 0;
+	dma_cb.reserved[1] = 0;
+
+	DMA_CS(channel) = 0;
+	DMA_TXFR_LEN(channel) = 0;
+
+	return 0;
 }
 
-void DMA_start( void )
+void DMA_start( DMA_channel_t channel )
 {
-	DMA_CS(DMA_DREQ_PWM) = DMA_CS_RESET;
+	DMA_CS(channel) = DMA_CS_RESET;
 	usleep(10);
 
-	DMA_CS(DMA_DREQ_PWM) = DMA_CS_INT | DMA_CS_END;
+	DMA_CS(channel) = DMA_CS_INT | DMA_CS_END;
 	usleep(10);
 
-	DMA_CONBLK_AD(DMA_DREQ_PWM) = (uint32_t)DMA_CB_ADDR;
-	DMA_DEBUG(DMA_DREQ_PWM) = 7;
-	DMA_CS(DMA_DREQ_PWM) = DMA_CS_WAIT_OUTSTANDING_WRITES |
-							  DMA_CS_PANIC_PRIORITY(15) |
-							  DMA_CS_PRIORITY(15) |
-							  DMA_CS_ACTIVE;
+	DMA_CONBLK_AD(channel) = (uint32_t)DMA_CB_ADDR;
+	DMA_DEBUG(channel) = 7;
+	DMA_CS(channel) = DMA_CS_WAIT_OUTSTANDING_WRITES |
+						DMA_CS_PANIC_PRIORITY(15) |
+						DMA_CS_PRIORITY(15) |
+						DMA_CS_ACTIVE;
 }
 
-uint8_t DMA_wait( void )
+uint8_t DMA_wait( DMA_channel_t channel )
 {
-	while(    ( DMA_CS(DMA_DREQ_PWM) & DMA_CS_ACTIVE )
-		  && !( DMA_CS(DMA_DREQ_PWM) & DMA_CS_ERROR  ) )
+	while(    ( DMA_CS(channel) & DMA_CS_ACTIVE )
+		  && !( DMA_CS(channel) & DMA_CS_ERROR  ) )
 	{
 		usleep(10);
 	}
 
-	if( DMA_CS(DMA_DREQ_PWM) & DMA_CS_ERROR )
+	if( DMA_CS(channel) & DMA_CS_ERROR )
 	{
 		return 1;
 	}

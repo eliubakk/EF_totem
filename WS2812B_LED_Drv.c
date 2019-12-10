@@ -7,71 +7,43 @@
  */
 
 #include "WS2812B_LED_Drv.h"
-//#include "pwm.h"
+#include "DMA.h"
 
-volatile uint8_t led_raw[PWM_BYTE_COUNT(NUM_LED, LED_FREQ_HZ)] __attribute__((section(".LED_RAW")));
-volatile dma_cb_t dma_cb __attribute__((section(".DMA_CB")));
+volatile uint8_t led_raw[PWM_BYTE_COUNT_FREQ(NUM_LED, LED_FREQ_HZ)] __attribute__((section(".LED_RAW")));
 
-uint8_t pwm_serial_init(uint32_t freq, WS2812B_LED_config_t config) {
-	uint32_t div;
+uint8_t WS2812B_LED_init(WS2812B_LED_config_t cfg) {
+	//uint32_t div;
 	int32_t byte_count;
 	//int32_t word_count;
 	uint8_t ret;
 	int32_t i;
-	PWM_config_t pwm_cfg;
+	//volatile uint32_t *led_raw_local = (uint32_t *)led_raw
 
-	pwm_cfg.period = (PWM_period_t)(1.0 / (3 * freq));
-	pwm_cfg.channel = config.channel;
-	pwm_cfg.port = config.pin;
-	//volatile uint32_t *led_raw_local = (uint32_t *)led_raw;
+	/* Update period -> One Period == One Symbol */
+	cfg.pwm_cfg.period /= PWM_SYMBOL_BITS;
 
 	/* Turn off PWM if already init */
 	PWM_deinit();
 
 	/* Init PWM gpio and clock */
-	ret = PWM_init(pwm_cfg);
+	ret = PWM_init(cfg.pwm_cfg);
 
 	if(ret == 0)
 	{
-		byte_count = PWM_BYTE_COUNT(config.num_led, freq);
+		byte_count = PWM_BYTE_COUNT(cfg.num_led, cfg.pwm_cfg.period);
 		//word_count = byte_count / sizeof(uint32_t);
 		for(i = 0; i < byte_count; ++i)
 		{
 			led_raw[i] = 0;
 		}
 
-		dma_cb.ti = (uint32_t)(DMA_TI_NO_WIDE_BURSTS |
-							   DMA_TI_WAIT_RESP |
-							   DMA_TI_DEST_DREQ |
-							   DMA_TI_PREMAP(DMA_DREQ_PWM) |
-							   DMA_TI_SRC_INC);
-
-		dma_cb.source_ad = (uint32_t)LED_RAW_ADDR;
-		dma_cb.dest_ad = (uint32_t)&PWM_FIF1;
-		dma_cb.txfr_len = byte_count;
-		dma_cb.stride = 0;
-		dma_cb.nextconbk = 0;
-		dma_cb.reserved[0] = 0;
-		dma_cb.reserved[1] = 0;
-
-		DMA_CS(PWM_DMA_CHANNEL) = 0;
-		DMA_TXFR_LEN(PWM_DMA_CHANNEL) = 0;
+		ret = DMA_init(DMA_DREQ_PWM, LED_RAW_ADDR, (uint32_t)&PWM_FIF1, byte_count);
 	}
 	
 	return ret;
 }
 
-
-
-uint8_t WS2812B_LED_init(WS2812B_LED_config_t config) {
-	if(pwm_serial_init(LED_FREQ_HZ, config) != 0) {
-		return 1;
-	}
-
-	return 0;
-}
-
-uint8_t WS2812B_LED_refresh(WS2812B_LED_config_t config, uint32_t *leds) {
+uint8_t WS2812B_LED_refresh(WS2812B_LED_config_t cfg, uint32_t *leds) {
 	uint32_t led_i;
 	uint32_t word_i;
 	int8_t bit_i;
@@ -83,7 +55,7 @@ uint8_t WS2812B_LED_refresh(WS2812B_LED_config_t config, uint32_t *leds) {
 	word_i = 0;
 	data_i = 31;
 
-	for(led_i = 0; led_i < config.num_led; ++led_i) 
+	for(led_i = 0; led_i < cfg.num_led; ++led_i) 
 	{
 		for(bit_i = LED_COLOR_BITS - 1; bit_i >= 0; --bit_i) 
 		{
@@ -105,11 +77,11 @@ uint8_t WS2812B_LED_refresh(WS2812B_LED_config_t config, uint32_t *leds) {
 		}
 	}
 
-	if(dma_wait() != 0) {
+	if(DMA_wait(DMA_DREQ_PWM) != 0) {
 		return 1;
 	}
 
-	dma_start();
+	DMA_start(DMA_DREQ_PWM);
 
 	return 0;
 }

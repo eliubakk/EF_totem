@@ -30,16 +30,12 @@
  *    LOCAL DEFINES                                                                  *
  *************************************************************************************/
 
-/* Base Address */
-#define PWM_BASE	(P_BASE + 0x20C000)
-
 /* PWM Registers */
 #define PWM_CTL		HW_IO(PWM_BASE)			/* PWM Control */
 #define PWM_STA		HW_IO(PWM_BASE + 0x4)	/* PWM Status */
 #define PWM_DMAC	HW_IO(PWM_BASE + 0x8)	/* PWM DMA Configuration */
 #define PWM_RNG1	HW_IO(PWM_BASE + 0x10)	/* PWM Channel 1 Range */
 #define PWM_DAT1	HW_IO(PWM_BASE + 0x14)	/* PWM Channel 1 Data */
-#define PWM_FIF1	HW_IO(PWM_BASE + 0x18)	/* PWM FIFO Input */
 #define PWM_RNG2	HW_IO(PWM_BASE + 0x20)	/* PWM Channel 2 Range */
 #define PWM_DAT2	HW_IO(PWM_BASE + 0x24)	/* PWM Channel 2 Data */
 

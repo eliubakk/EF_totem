@@ -32,6 +32,8 @@
  *    DEFINES                                                                        *
  *************************************************************************************/
 
+/* DMA DREQ Peripheral Assignments */
+#define DMA_DREQ_PWM	5
 
 /*************************************************************************************
  *    MACROS                                                                         *
@@ -59,20 +61,23 @@ typedef struct
     uint32_t reserved[2];
 } __attribute__((packed, aligned(4))) dma_cb_t;
 
+typedef uint32_t	DMA_channel_t;
+
 /*************************************************************************************
  *    GLOBAL VARIABLES                                                               *
  *************************************************************************************/
 
+volatile extern dma_cb_t dma_cb;
 
 /*************************************************************************************
  *    GLOBAL FUNCTION PROTOTYPES                                                     *
  *************************************************************************************/
 
-void DMA_init( void );
+uint8_t DMA_init( DMA_channel_t channel, uint32_t source_addr, uint32_t dest_addr, uint32_t tx_len );
 
-void DMA_start( void );
+void DMA_start( DMA_channel_t channel );
 
-uint8_t DMA_wait( void );
+uint8_t DMA_wait( DMA_channel_t channel );
 
 /*************************************************************************************/
 

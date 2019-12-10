@@ -164,6 +164,17 @@ void usleep(uint32_t usec)
     while(1) if(SYS_TIMER_MATCH(1)) break;
 }
 
+/**************** ARM TIMER ****************/
+void ARM_timer_init(uint32_t load_val)
+{
+	ARM_TIMER_CTL = 0x003E0002;
+    ARM_TIMER_LOD = (load_val - 1);
+    //ARM_TIMER_RLD = (TIMEOUT-1);
+    ARM_TIMER_DIV = 0x000000F9;
+    ARM_TIMER_CLI = 0;
+    ARM_TIMER_CTL = 0x003E0082;
+}
+
 /**************** CLOCK MANAGER ****************/
 uint8_t CM_init(CM_config_t cfg)
 {
@@ -229,7 +240,6 @@ void CM_deinit(CM_config_t cfg)
 	while(1) if(!(CM_CLK_CTL(cfg.periph) & CM_CLK_CTL_BUSY)) break;
 }
 
-
 /**************** GPIO ****************/
 void GPIO_configure(GPIO_pin_t p)
 {
@@ -246,51 +256,51 @@ void GPIO_configure(GPIO_pin_t p)
     GPFSEL(p.num / 10) = reg;
 }
 
-void GPIO_set(uint8_t pin)
+void GPIO_set(GPIO_pin_t p)
 {
-	if(pin < 32)
+	if(p.num < 32)
 	{
-		GPSET0 = (1 << pin);
+		GPSET0 = (1 << p.num);
 	}
 	else
 	{
-		GPSET1 = (1 << (pin - 32));
+		GPSET1 = (1 << (p.num - 32));
 	}
 }
 
-void GPIO_clear(uint8_t pin)
+void GPIO_clear(GPIO_pin_t p)
 {
-	if(pin < 32)
+	if(p.num < 32)
 	{
-		GPCLR0 = (1 << pin);
+		GPCLR0 = (1 << p.num);
 	}
 	else
 	{
-		GPCLR1 = (1 << (pin - 32));
+		GPCLR1 = (1 << (p.num - 32));
 	}
 }
 
-uint8_t GPIO_level(uint8_t pin)
+uint8_t GPIO_level(GPIO_pin_t p)
 {
-	if(pin < 32)
+	if(p.num < 32)
 	{
-		return (1 & (GPLEV0 >> pin));
+		return (1 & (GPLEV0 >> p.num));
 	}
 	else
 	{
-		return (1 & (GPLEV1 >> (pin - 32)));
+		return (1 & (GPLEV1 >> (p.num - 32)));
 	}
 }
 
-void GPIO_toggle(uint8_t pin)
+void GPIO_toggle(GPIO_pin_t p)
 {
-	if(GPIO_level(pin))
+	if(GPIO_level(p))
 	{
-		GPIO_clear(pin);
+		GPIO_clear(p);
 	}
 	else
 	{
-		GPIO_set(pin);
+		GPIO_set(p);
 	}
 }
 

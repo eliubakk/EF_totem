@@ -9,9 +9,10 @@
 #ifndef __WS2812B_LED_DRV_H__
 #define __WS2812B_LED_DRV_H__
 
-#include "BCM2836_HW.h"
+#include "PWM.h"
 
-#define LED_FREQ_MHZ	0.8
+#define LED_FREQ_HZ		800000 // 800 Khz
+#define LED_PERIOD_US	1.25 // TH + TL = 1.25us +- 600ns
 #define LED_ZERO_HIGH	15 //250000000		/* 0.4us / 0.004us = 100 clock periods, 400ns / 4ns = 100 clock periods */
 #define LED_ONE_HIGH	170 //500000000		/* 0.8us / 0.004us = 200 clock periods, 800ns / 4ns = 200 clock periods */
 #define LED_ZERO_LOW	150 //250000000		/* 0.85us / 0.004us = 212.5 clock periods, 850ns / 4ns = 212.5 clock periods */
@@ -20,8 +21,9 @@
 #define LED_COLOR_BITS	24  /* Three colors, 8 bits each */
 
 // PWM Symbol definitions
-#define PWM_ONE		0x6  /* 1 1 0 */
-#define PWM_ZERO	0x4  /* 1 0 0 */
+#define PWM_SYMBOL_BITS	3
+#define PWM_ONE			0x6  /* 1 1 0 */
+#define PWM_ZERO		0x4  /* 1 0 0 */
 
 #define NUM_LED 1
 
@@ -50,89 +52,93 @@
 // #define DATA_MASK_B22 	0x00000002
 // #define DATA_MASK_B23 	0x00000001
 
-#define NP_COLOUR_BLUE 0x00200088
-#define NP_COLOUR_YELLOW 0x0083A400
-#define NP_COLOUR_GREEN 0x00901030
-#define NP_COLOUR_RED 0x00209925
+#define NP_COLOUR_BLUE		0x00200088
+#define NP_COLOUR_YELLOW	0x0083A400
+#define NP_COLOUR_GREEN		0x00901030
+#define NP_COLOUR_RED		0x00209925
 
 #define COLOR_BLUE 		0x00000020
 #define COLOR_YELLOW	0x0083A400
 #define COLOR_GREEN		0x00200000
 #define COLOR_RED		0x00002000
 
-#define HIGH_PIN_SEND_ONE(mask) ({ \
-	ARM_TIMER_CTL = 0x003E0002; \
-	ARM_TIMER_LOD = (LED_ONE_HIGH); \
-	ARM_TIMER_CLI = 0; \
-	ARM_TIMER_CTL = 0x003E0082; \
-	GPSET1 = mask; \
-	while(1) if(ARM_TIMER_RIS) { GPCLR1 = mask; break; }\
-	ARM_TIMER_CLI = 0; \
-	ARM_TIMER_LOD = (LED_ONE_LOW); \
-	while(1) if(ARM_TIMER_RIS) break; \
-})
+// #define HIGH_PIN_SEND_ONE(mask) ({ 
+// 	ARM_TIMER_CTL = 0x003E0002; 
+// 	ARM_TIMER_LOD = (LED_ONE_HIGH); 
+// 	ARM_TIMER_CLI = 0; 
+// 	ARM_TIMER_CTL = 0x003E0082; 
+// 	GPSET1 = mask; 
+// 	while(1) if(ARM_TIMER_RIS) { GPCLR1 = mask; break; }
+// 	ARM_TIMER_CLI = 0; 
+// 	ARM_TIMER_LOD = (LED_ONE_LOW); 
+// 	while(1) if(ARM_TIMER_RIS) break; 
+// })
 
-#define LOW_PIN_SEND_ONE(mask) ({ \
-	ARM_TIMER_CTL = 0x003E0002; \
-	ARM_TIMER_LOD = (LED_ONE_HIGH); \
-	ARM_TIMER_CLI = 0; \
-	ARM_TIMER_CTL = 0x003E0082; \
-	GPSET0 = mask; \
-	while(1) if(ARM_TIMER_RIS) { GPCLR0 = mask; break; } \
-	ARM_TIMER_CLI = 0; \
-	ARM_TIMER_LOD = (LED_ONE_LOW); \
-	while(1) if(ARM_TIMER_RIS) break; \
-})
+// #define LOW_PIN_SEND_ONE(mask) ({ 
+// 	ARM_TIMER_CTL = 0x003E0002; 
+// 	ARM_TIMER_LOD = (LED_ONE_HIGH); 
+// 	ARM_TIMER_CLI = 0; 
+// 	ARM_TIMER_CTL = 0x003E0082; 
+// 	GPSET0 = mask; 
+// 	while(1) if(ARM_TIMER_RIS) { GPCLR0 = mask; break; } 
+// 	ARM_TIMER_CLI = 0; 
+// 	ARM_TIMER_LOD = (LED_ONE_LOW); 
+// 	while(1) if(ARM_TIMER_RIS) break; 
+// })
 
-#define HIGH_PIN_SEND_ZERO(mask) ({ \
-	ARM_TIMER_CTL = 0x003E0002; \
-	ARM_TIMER_LOD = (LED_ZERO_HIGH); \
-	ARM_TIMER_CLI = 0; \
-	ARM_TIMER_CTL = 0x003E0082; \
-	GPSET1 = mask; \
-	while(1) if(ARM_TIMER_RIS) { GPCLR1 = mask; break; } \
-	ARM_TIMER_CLI = 0; \
-	ARM_TIMER_LOD = (LED_ZERO_LOW); \
-	while(1) if(ARM_TIMER_RIS) break; \
-})
+// #define HIGH_PIN_SEND_ZERO(mask) ({ 
+// 	ARM_TIMER_CTL = 0x003E0002; 
+// 	ARM_TIMER_LOD = (LED_ZERO_HIGH); 
+// 	ARM_TIMER_CLI = 0; 
+// 	ARM_TIMER_CTL = 0x003E0082; 
+// 	GPSET1 = mask; 
+// 	while(1) if(ARM_TIMER_RIS) { GPCLR1 = mask; break; } 
+// 	ARM_TIMER_CLI = 0; 
+// 	ARM_TIMER_LOD = (LED_ZERO_LOW); 
+// 	while(1) if(ARM_TIMER_RIS) break; 
+// })
 
-#define LOW_PIN_SEND_ZERO(mask) ({ \
-	ARM_TIMER_CTL = 0x003E0002; \
-	ARM_TIMER_LOD = (LED_ZERO_HIGH); \
-	ARM_TIMER_CLI = 0; \
-	ARM_TIMER_CTL = 0x003E0082; \
-	GPSET0 = mask; \
-	while(1) if(ARM_TIMER_RIS) { GPCLR0 = mask; break; } \
-	ARM_TIMER_CLI = 0; \
-	ARM_TIMER_LOD = (LED_ZERO_LOW); \
-	while(1) if(ARM_TIMER_RIS) break; \
-})
+// #define LOW_PIN_SEND_ZERO(mask) ({ 
+// 	ARM_TIMER_CTL = 0x003E0002; 
+// 	ARM_TIMER_LOD = (LED_ZERO_HIGH); 
+// 	ARM_TIMER_CLI = 0; 
+// 	ARM_TIMER_CTL = 0x003E0082; 
+// 	GPSET0 = mask; 
+// 	while(1) if(ARM_TIMER_RIS) { GPCLR0 = mask; break; } 
+// 	ARM_TIMER_CLI = 0; 
+// 	ARM_TIMER_LOD = (LED_ZERO_LOW); 
+// 	while(1) if(ARM_TIMER_RIS) break; 
+// })
 
 typedef struct {
-	uint8_t		channel;	/* PWM channel */
-	uint8_t 	pin;		/* GPIO pin for PWM */
-	uint32_t	num_led;	/* Number of LEDS */
+	PWM_config_t	pwm_cfg;
+	uint32_t		num_led;	/* Number of LEDS */
 } WS2812B_LED_config_t;
 
 /* 3 PWM bits needed for each bit of led color, and zero for 55us to reset */
-#define PWM_BIT_COUNT(leds, freq) 	(((leds) * LED_COLOR_BITS * 3) \
-									+ ((LED_RESET_US * ((freq) * 3)) / 1000000))
+#define PWM_BIT_COUNT(leds, period) (  ((leds)*LED_COLOR_BITS*PWM_SYMBOL_BITS) \
+									  +((uint32_t)(LED_RESET_US/(period)))     \
+									)
 
 // Pad out to the nearest uint32 + 32-bits for idle low/high times the number of channels
-#define PWM_BYTE_COUNT(leds, freq)	(((((PWM_BIT_COUNT(leds, freq) >> 3) & ~0x7) + 4) + 4))
+#define PWM_BYTE_COUNT(leds, period)	(((((PWM_BIT_COUNT(leds, period) >> 3) & ~0x7) + 4) + 4))
 
 
-volatile extern uint8_t led_raw[PWM_BYTE_COUNT(NUM_LED, LED_FREQ_HZ)];
-volatile extern dma_cb_t dma_cb;
+/* 3 PWM bits needed for each bit of led color, and zero for 55us to reset */
+#define PWM_BIT_COUNT_FREQ(leds, freq)	(((leds) * LED_COLOR_BITS * PWM_SYMBOL_BITS) \
+										+ ((LED_RESET_US * ((freq) * PWM_SYMBOL_BITS)) / 1000000))
+
+// Pad out to the nearest uint32 + 32-bits for idle low/high times the number of channels
+#define PWM_BYTE_COUNT_FREQ(leds, freq)	(((((PWM_BIT_COUNT_FREQ(leds, freq) >> PWM_SYMBOL_BITS) & ~0x7) + 4) + 4))
+
+
+extern volatile uint8_t led_raw[PWM_BYTE_COUNT_FREQ(NUM_LED, LED_FREQ_HZ)];
 
 #define LED_RAW_ADDR 0xC0019000
-#define DMA_CB_ADDR  0xC0018000
 
-uint8_t pwm_serial_init(uint32_t freq, WS2812B_LED_config_t config);
+uint8_t WS2812B_LED_init(WS2812B_LED_config_t cfg);
 
-uint8_t WS2812B_LED_init(WS2812B_LED_config_t config);
-
-uint8_t WS2812B_LED_refresh(WS2812B_LED_config_t config, uint32_t *leds);
+uint8_t WS2812B_LED_refresh(WS2812B_LED_config_t cfg, uint32_t *leds);
 
 //void send_data(uint8_t pin, uint32_t data);
 
