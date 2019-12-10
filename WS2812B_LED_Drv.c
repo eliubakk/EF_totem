@@ -24,27 +24,11 @@ uint8_t pwm_serial_init(uint32_t freq, WS2812B_LED_config_t config) {
 	pwm_cfg.port = config.pin;
 	//volatile uint32_t *led_raw_local = (uint32_t *)led_raw;
 
+	/* Turn off PWM if already init */
 	PWM_deinit();
 
+	/* Init PWM gpio and clock */
 	PWM_init(pwm_cfg);
-	/* Configure GPIO */
-	// if(pwm_GPIO_init(config.channel, config.pin) != 0) {
-	// 	return 1;
-	// }
-
-	// /* Turn off PWM if already init */
-	// pwm_deinit();
-
-	// /* Set up PWM clock */
-	// div = 8; //OSC_FREQ / (3 * freq);
-	// CM_CLK_PWMDIV = CM_CLK_DIV_PASSWD | CM_CLK_DIV_DIVI(div);
-	// usleep(100);
-	// CM_CLK_PWMCTL = CM_CLK_CTL_PASSWD | CM_CLK_CTL_SRC_OSC;
-	// usleep(100);
-	// CM_CLK_PWMCTL = CM_CLK_CTL_PASSWD | CM_CLK_CTL_SRC_OSC | CM_CLK_CTL_ENAB;
-	// usleep(100);
-
-	// while(1) if(CM_CLK_PWMCTL & CM_CLK_CTL_BUSY) break;
 
 	/* Set up PWM module for serial data transfer */
 	PWM_RNG1 = 32;
@@ -94,50 +78,6 @@ uint8_t pwm_serial_init(uint32_t freq, WS2812B_LED_config_t config) {
 	DMA_TXFR_LEN(PWM_DMA_CHANNEL) = 0;
 
 	return 0;
-}
-
-void pwm_deinit( void ) {
-	/* Turn off PWM */
-	PWM_CTL = 0;
-	usleep(10);
-
-	/* Kill PWM clock */
-	CM_CLK_PWMCTL = CM_CLK_CTL_PASSWD | CM_CLK_CTL_KILL;
-	usleep(10);
-	while(1) if(!(CM_CLK_PWMCTL & CM_CLK_CTL_BUSY)) break;
-}
-
-/* 	Configure pwm output pin
-	returns: 0 - Success 
-			 1 - Bad channel
-			 2 - Bad pin */
-uint8_t pwm_GPIO_init(uint8_t channel, uint8_t pin) {
-	uint8_t i;
-	pin_config_t pwm_pins[2][4];
-	pwm_pins[0][0] = (pin_config_t){.pin = 12, .alt = GPIO_ALT0};
-	pwm_pins[0][1] = (pin_config_t){.pin = 18, .alt = GPIO_ALT5};
-	pwm_pins[0][2] = (pin_config_t){.pin = 40, .alt = GPIO_ALT0};
-	pwm_pins[0][3] = (pin_config_t){.pin = 52, .alt = GPIO_ALT1};
-	pwm_pins[1][0] = (pin_config_t){.pin = 13, .alt = GPIO_ALT0};
-	pwm_pins[1][1] = (pin_config_t){.pin = 19, .alt = GPIO_ALT5};
-	pwm_pins[1][2] = (pin_config_t){.pin = 41, .alt = GPIO_ALT0};
-	pwm_pins[1][3] = (pin_config_t){.pin = 45, .alt = GPIO_ALT0};
-
-	/* Check if channel is allowed */
-	if(channel > 1) {
-		return 1;
-	}
-
-	/* Check if pin is allowed for given channel, and configure GPIO */
-	for(i = 0; i < 4; ++i) {
-		if(pwm_pins[channel][i].pin == pin){
-			GPIO_configure(pwm_pins[channel][i]);
-			return 0;
-		}
-	}
-
-	/* Pin not found for channel */
-	return 2;
 }
 
 void dma_start( void ) {
