@@ -9,6 +9,13 @@
 #include "WS2812B_LED_Drv.h"
 #include "DMA.h"
 
+#define TEST_GPIO_ENABLE
+
+#if defined( TEST_GPIO_ENABLE )
+# define TEST_GPIO_PIN	27
+# define TEST_GPIO_US	500000
+#endif
+
 volatile uint8_t led_raw[PWM_BYTE_COUNT_FREQ(NUM_LED, LED_FREQ_HZ)] __attribute__((section(".LED_RAW")));
 
 uint8_t WS2812B_LED_init(WS2812B_LED_config_t cfg) {
@@ -17,27 +24,84 @@ uint8_t WS2812B_LED_init(WS2812B_LED_config_t cfg) {
 	//int32_t word_count;
 	uint8_t ret;
 	int32_t i;
+#if defined( TEST_GPIO_ENABLE )
+	GPIO_pin_t gpio_test_pin;
+#endif
 	//volatile uint32_t *led_raw_local = (uint32_t *)led_raw
+
+#if defined( TEST_GPIO_ENABLE )
+	gpio_test_pin = (GPIO_pin_t){.num = TEST_GPIO_PIN, .alt = GPIO_OUTPUT};
+
+	GPIO_configure(gpio_test_pin);
+	GPIO_clear(gpio_test_pin);
+	usleep(TEST_GPIO_US);
+	GPIO_set(gpio_test_pin);
+	usleep(TEST_GPIO_US);
+	GPIO_clear(gpio_test_pin);
+#endif
 
 	/* Update period -> One Period == One Symbol */
 	cfg.pwm_cfg.period /= PWM_SYMBOL_BITS;
 
+#if defined( TEST_GPIO_ENABLE )
+	usleep(TEST_GPIO_US);
+	GPIO_set(gpio_test_pin);
+	usleep(TEST_GPIO_US);
+	GPIO_clear(gpio_test_pin);
+#endif
+
 	/* Turn off PWM if already init */
 	PWM_deinit();
 
+#if defined( TEST_GPIO_ENABLE )
+	usleep(TEST_GPIO_US);
+	GPIO_set(gpio_test_pin);
+	usleep(TEST_GPIO_US);
+	GPIO_clear(gpio_test_pin);
+#endif
+
 	/* Init PWM gpio and clock */
 	ret = PWM_init(cfg.pwm_cfg);
+
+#if defined( TEST_GPIO_ENABLE )
+	usleep(TEST_GPIO_US);
+	GPIO_set(gpio_test_pin);
+	usleep(TEST_GPIO_US);
+	GPIO_clear(gpio_test_pin);
+#endif
 
 	if(ret == 0)
 	{
 		byte_count = PWM_BYTE_COUNT(cfg.num_led, cfg.pwm_cfg.period);
 		//word_count = byte_count / sizeof(uint32_t);
+#if defined( TEST_GPIO_ENABLE )
+		usleep(TEST_GPIO_US);
+		GPIO_set(gpio_test_pin);
+		usleep(TEST_GPIO_US);
+		GPIO_clear(gpio_test_pin);
+#endif
+
 		for(i = 0; i < byte_count; ++i)
 		{
 			led_raw[i] = 0;
 		}
 
+#if defined( TEST_GPIO_ENABLE )
+		usleep(TEST_GPIO_US);
+		GPIO_set(gpio_test_pin);
+		usleep(TEST_GPIO_US);
+		GPIO_clear(gpio_test_pin);
+#endif
+
 		ret = DMA_init(DMA_DREQ_PWM, LED_RAW_ADDR, (uint32_t)&PWM_FIF1, byte_count);
+
+#if defined( TEST_GPIO_ENABLE )
+		usleep(TEST_GPIO_US);
+		GPIO_set(gpio_test_pin);
+		usleep(TEST_GPIO_US);
+		GPIO_clear(gpio_test_pin);
+#endif
+
 	}
 	
 	return ret;

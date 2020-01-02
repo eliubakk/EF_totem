@@ -12,6 +12,13 @@ extern void dummy ( unsigned int );
 #define PWM_CHANNEL 0
 #define PWM_PIN 18
 
+#define TEST_GPIO_ENABLE
+
+#if defined( TEST_GPIO_ENABLE )
+# define TEST_GPIO_PIN  17
+# define TEST_GPIO_US   100000
+#endif
+
 //-------------------------------------------------------------------------
 int notmain ( void )
 {
@@ -23,6 +30,9 @@ int notmain ( void )
     uint32_t colors[3];
     uint32_t color_i;
     uint32_t leds[NUM_LED];
+#if defined( TEST_GPIO_ENABLE )
+    GPIO_pin_t gpio_test_pin;
+#endif
 
     color_i = 0;
     colors[0] = COLOR_GREEN;
@@ -32,6 +42,16 @@ int notmain ( void )
     /* On board LEDs */
     green_led = (GPIO_pin_t){.num = 47, .alt = GPIO_OUTPUT};
     red_led = (GPIO_pin_t){.num = 35, .alt = GPIO_OUTPUT};
+#if defined( TEST_GPIO_ENABLE )
+    gpio_test_pin = (GPIO_pin_t){.num = TEST_GPIO_PIN, .alt = GPIO_OUTPUT};
+
+    GPIO_configure(gpio_test_pin);
+    GPIO_clear(gpio_test_pin);
+    usleep(TEST_GPIO_US);
+    GPIO_set(gpio_test_pin);
+    usleep(TEST_GPIO_US);
+    GPIO_clear(gpio_test_pin);
+#endif
 
     GPIO_configure(green_led);
     GPIO_configure(red_led);
@@ -49,7 +69,24 @@ int notmain ( void )
     led_cfg.pwm_cfg.period = LED_PERIOD_US;
     led_cfg.num_led = NUM_LED;
 
-    usleep(ONE_SECOND * 5);
+    GPIO_set(red_led);
+#if defined( TEST_GPIO_ENABLE )
+    GPIO_set(gpio_test_pin);
+#endif
+    usleep(ONE_SECOND * 2);
+#if defined( TEST_GPIO_ENABLE )
+    GPIO_clear(gpio_test_pin);
+#endif
+    GPIO_clear(red_led);
+    GPIO_set(green_led);
+    usleep(ONE_SECOND * 2);
+    GPIO_clear(green_led);
+#if defined( TEST_GPIO_ENABLE )
+    GPIO_set(gpio_test_pin);
+    usleep(TEST_GPIO_US);
+    GPIO_clear(gpio_test_pin);
+#endif
+
 
     if(WS2812B_LED_init(led_cfg) != 0) {
         GPIO_set(red_led);

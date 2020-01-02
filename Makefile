@@ -7,8 +7,8 @@ ARMGNU = $(COMPILER_BIN)
 
 GCC = $(COMPILER_BASE)/bin/arm-eabi-gcc
 
-AOPS = --warn --fatal-warnings 
-COPS = -Wall -Werror -O2 -nostdlib -nostartfiles -ffreestanding 
+AOPS = --warn --fatal-warnings -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard
+COPS = -Wall -Werror -O2 -nostdlib -nostartfiles -ffreestanding -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard
 
 PROJECT_NAME = blinker04
 LINK_SCRIPT = linker_script
@@ -32,7 +32,7 @@ clean :
 	rm -f *.clang.opt.s
 
 $(patsubst %.s, %.o, $(ASMS)): %.o : %.s
-	$(ARMGNU)/as $^ -o $@
+	$(ARMGNU)/as $(AOPS) $^ -o $@
 
 $(patsubst %.c, %.o, $(SRCS)): %.o : %.c %.h
 	$(GCC) $(COPS) -c $< -o $@

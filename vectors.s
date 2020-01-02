@@ -2,6 +2,7 @@
 ;@-------------------------------------------------------------------------
 ;@-------------------------------------------------------------------------
 
+.extern __STACK_ADDR
 
 .globl _start
 _start:
@@ -22,6 +23,7 @@ hyp_handler:        .word hang
 irq_handler:        .word hang
 fiq_handler:        .word hang
 
+
 reset:
 
     ;@ b skip
@@ -33,6 +35,20 @@ reset:
     msr ELR_hyp,r0
     eret
 skip:
+
+    ;@ read NSACR fpu access register and enable access to CP10 and CP11
+    ;@mrc p15, 0, r0, c1, c1, 2
+    ;@orr r0, r0, #0xC00
+    ;@mcr p15, 0, r0, c1, c1, 2
+
+    ;@ read CPACR register, and set access bits for CP10 and CP11
+    ;@mrc p15, 0, r0, c1, c0, 2
+    ldr r0, =0xF00000
+    mcr p15, 0, r0, c1, c0, 2
+
+    ;@ Set FPEXC EN bit to enable FPU
+    mov r0, #0x40000000
+    vmsr FPEXC, r0
 
     mrc p15, 0, r1, c12, c0, 0 ;@ get vbar
     mov r0,#0x8000
@@ -58,6 +74,8 @@ skip:
     bic r2,#0x0004
     mcr p15,0,r2,c1,c0,0
 
+    ;@movw sp,#:lower16:__STACK_ADDR
+    ;@movt sp,#:upper16:__STACK_ADDR
     mov sp,#0x8000
     mov r0,pc
     bl notmain
